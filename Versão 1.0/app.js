@@ -14,11 +14,8 @@
 const SHEET_CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEq8oeTNFgdAnWZIGOrmoU8QO7WqlMAyvXLPS5rToesYvZdNaoJAgj3pyVcNpPHo8Sk4ty_IukrWt9/pub?gid=232780593&single=true&output=csv';
 
-// ─── URL DA ABA DE FOTOS ──────────────────────────────────────
-// Abra a planilha → clique na aba "Fotos" → copie o gid da URL
-// e substitua XXXXXXXXX abaixo.
-const SHEET_FOTOS_URL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEq8oeTNFgdAnWZIGOrmoU8QO7WqlMAyvXLPS5rToesYvZdNaoJAgj3pyVcNpPHo8Sk4ty_IukrWt9/pub?gid=605523322&single=true&output=csv';
+// ─── FOTOS JSON ───────────────────────────────────────────────
+const FOTOS_JSON_URL = 'fotos.json';
 // ─────────────────────────────────────────────────────────────
 
 const INTERVALO_MINUTOS  = 5;
@@ -80,72 +77,20 @@ function setStatus(estado, texto) {
 }
 
 /* ============================================================
-   FOTOS — V3  (lê da aba "Fotos" do Google Sheets)
+   FOTOS — V3  (lê de fotos.json)
    ============================================================ */
 async function carregarFotos() {
   try {
-    const url  = SHEET_FOTOS_URL + '&t=' + Date.now();
-    const resp = await fetch(url, { cache: 'no-store' });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const csv  = await resp.text();
-    FOTOS_MAP  = parsearFotosCSV(csv);
+    const resp = await fetch(FOTOS_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('fotos.json not found');
+    const dados = await resp.json();
+    FOTOS_MAP     = dados.itens    || {};
+    FOTO_FALLBACK = dados.fallback || 'logo.png';
     console.info('[Fotos] Loaded:', Object.keys(FOTOS_MAP).length, 'photos');
   } catch (e) {
-    console.warn('[Fotos] Could not load photos, using fallback:', e.message);
+    console.warn('[Fotos] Using fallback:', e.message);
     FOTOS_MAP = {};
   }
-}
-
-function parsearFotosCSV(csv) {
-  const linhas = csv.trim().split('\n');
-  const map    = {};
-
-  // Localiza a linha de cabeçalho (procura "nome do corte" ou "link")
-  let inicio = 0;
-  for (let i = 0; i < Math.min(10, linhas.length); i++) {
-    const l = linhas[i].toLowerCase();
-    if (l.includes('nome do corte') || l.includes('link')) {
-      inicio = i + 1;
-      break;
-    }
-  }
-
-  for (let i = inicio; i < linhas.length; i++) {
-    const p    = splitCSVLinha(linhas[i]);
-    if (p.length < 3) continue;
-
-    const nome = (p[1] || '').replace(/"/g, '').trim();
-    const link = (p[2] || '').replace(/"/g, '').trim();
-    if (!nome || !link) continue;
-
-    const fotoUrl = converterLinkDrive(link);
-    if (fotoUrl) {
-      map[nome] = { foto: fotoUrl, alt: nome + ' — Açougue Ouro Verde' };
-    }
-  }
-  return map;
-}
-
-function converterLinkDrive(url) {
-  if (!url) return null;
-
-  // Já é um link direto uc?export
-  if (url.includes('drive.google.com/uc')) return url;
-
-  // Formato: https://drive.google.com/file/d/FILE_ID/view
-  const matchFile = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (matchFile) {
-    return `https://drive.google.com/uc?export=view&id=${matchFile[1]}`;
-  }
-
-  // Formato: https://drive.google.com/open?id=FILE_ID
-  const matchOpen = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (matchOpen) {
-    return `https://drive.google.com/uc?export=view&id=${matchOpen[1]}`;
-  }
-
-  // Formato desconhecido — usa como está
-  return url;
 }
 
 function getFoto(nomeCorte) {
@@ -162,15 +107,13 @@ function criarImgComFallback(nomeCorte, cssClass) {
   img.alt = alt;
   if (cssClass) img.className = cssClass;
   img.onerror = function() {
-    if (this.src === FOTO_FALLBACK || this.src.endsWith(FOTO_FALLBACK)) {
-      // Fallback também falhou → exibe placeholder com iniciais
+    if (this.src.endsWith(FOTO_FALLBACK)) {
       this.style.display = 'none';
       const ph = document.createElement('div');
-      ph.className  = 'foto-placeholder';
-      ph.textContent = nomeCorte.substring(0, 2).toUpperCase();
+      ph.className = 'foto-placeholder';
+      ph.textContent = nomeCorte.substring(0,2).toUpperCase();
       this.parentNode?.insertBefore(ph, this);
     } else {
-      console.warn('[Fotos] Broken image, using fallback:', this.src);
       this.src = FOTO_FALLBACK;
     }
   };

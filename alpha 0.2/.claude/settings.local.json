@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-Item \"C:\\\\Users\\\\Admin\\\\Desktop\\\\CASA\\\\AÇOUGUE OURO VERDE\\\\2\\\\app.js\")",
+      "Bash(Select-Object Name, LastWriteTime, Length)"
+    ]
+  }
+}

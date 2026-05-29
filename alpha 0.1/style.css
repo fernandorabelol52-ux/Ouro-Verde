@@ -1,0 +1,1058 @@
+/* ====================================================
+   MENU DIGITAL – AÇOUGUE OURO VERDE
+   Tema 100% Claro — Paleta Light
+   ==================================================== */
+
+/* --- RESET & BASE --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Fundo e superfícies */
+  --bg-page:        #FFFFFF;
+  --bg-card:        #F5F5F3;
+  --bg-card-alt:    #EFEFED;
+  --border-card:    #DEDBD6;
+
+  /* Bovinos — verde escuro sobre branco */
+  --accent-bovinos: #5A8A1F;
+  --bg-bovinos:     #EAF4D3;
+  --border-bovinos: #8DBE4A;
+
+  /* Suínos — âmbar escuro sobre branco */
+  --accent-suinos:  #C4701A;
+  --bg-suinos:      #FDE8C8;
+  --border-suinos:  #E8922A;
+
+  /* Aves — azul escuro sobre branco */
+  --accent-aves:    #2A7FAE;
+  --bg-aves:        #D6EEF8;
+  --border-aves:    #5BA8D4;
+
+  /* Promoção / Oferta */
+  --accent-oferta:  #E83030;
+  --promo-price:    #C0392B;
+  --bg-promo-card:  #FFF0F0;
+
+  /* Texto */
+  --text-primary:   #1A1A17;
+  --text-secondary: #4A4845;
+  --text-muted:     #8A8785;
+
+  /* Layout */
+  --header-h:      100px;
+  --footer-h:      52px;
+  --gap:           14px;
+  --radius:        10px;
+  --radius-lg:     16px;
+
+  /* Tipografia */
+  --font-display: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  --font-body:    'Barlow', 'Barlow Condensed', sans-serif;
+}
+
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====================================================
+   CABEÇALHO FIXO — fundo branco
+   ==================================================== */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: #FFFFFF;
+  border-bottom: 1px solid #DEDBD6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Faixa colorida no topo */
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #e83030 0%, #f5c518 50%, #e83030 100%);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-logo-img {
+  height: 75px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.store-name {
+  font-family: var(--font-display);
+  font-size: 50px;
+  letter-spacing: 3px;
+  color: #1A1A17;
+  line-height: 1;
+}
+
+.store-tagline {
+  font-size: 17px;
+  color: #4A4845;
+  letter-spacing: 2px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.header-date {
+  font-family: var(--font-display);
+  font-size: 36px;
+  color: #1A1A17;
+  letter-spacing: 2px;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F5F5F3;
+  border: 1px solid #DEDBD6;
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 14px;
+  color: #4A4845;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #A09D96;
+  transition: background 0.4s;
+}
+
+.status-badge.ok .status-dot   { background: #8DBE4A; animation: pulse-green 2s infinite; }
+.status-badge.ok #status-text  { color: #27AE60; }
+.status-badge.err .status-dot  { background: #E83030; }
+.status-badge.err #status-text { color: #E83030; }
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ====================================================
+   SLIDES WRAPPER
+   ==================================================== */
+.slides-wrapper {
+  position: fixed;
+  top: var(--header-h);
+  bottom: var(--footer-h);
+  left: 0;
+  right: 0;
+  z-index: 1;
+  overflow: hidden;
+  background: var(--bg-card-alt);
+}
+
+/* ====================================================
+   SLIDE BASE — opacity cross-fade
+   ==================================================== */
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+  will-change: opacity;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ====================================================
+   SLIDE 0: GRID PRINCIPAL (VISÃO GERAL)
+   ==================================================== */
+.main-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 460px;
+  gap: var(--gap);
+  padding: var(--gap);
+  background: var(--bg-card-alt);
+}
+
+/* ====================================================
+   COLUNAS DE CATEGORIAS
+   ==================================================== */
+.coluna {
+  background: var(--bg-page);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.coluna-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 28px 16px;
+  border-bottom: 2px solid transparent;
+}
+
+.bovinos-header {
+  background: #4A7A15;
+  border-bottom: none;
+}
+
+.suinos-header {
+  background: #B5621A;
+  border-bottom: none;
+}
+
+.coluna-icon {
+  font-size: 44px;
+  line-height: 1;
+}
+
+.coluna-titulo {
+  font-family: var(--font-display);
+  font-size: 48px;
+  letter-spacing: 3px;
+}
+
+.bovinos-header .coluna-titulo { color: #FFFFFF; }
+.suinos-header  .coluna-titulo { color: #FFFFFF; }
+
+/* ====================================================
+   LISTA DE ITENS
+   ==================================================== */
+.lista-itens {
+  list-style: none;
+  flex: 1;
+  overflow: hidden;
+  padding: 10px 0 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 28px;
+  gap: 12px;
+  border-bottom: 1px solid var(--bg-card-alt);
+  transition: background 0.2s;
+}
+
+.item-row:nth-child(even) { background: var(--bg-card); }
+.item-row:nth-child(odd)  { background: var(--bg-page); }
+
+.item-nome {
+  font-family: var(--font-body);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-dots {
+  flex: 1;
+  border-bottom: 2px dotted var(--border-card);
+  margin: 0 10px;
+  min-width: 24px;
+}
+
+.item-preco {
+  font-family: var(--font-display);
+  font-size: 38px;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.item-unidade {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 4px;
+  align-self: flex-end;
+  margin-bottom: 6px;
+}
+
+/* Item em promoção: vermelho escuro sobre branco */
+.item-row.em-promo .item-nome  { color: var(--promo-price); }
+.item-row.em-promo .item-preco { color: var(--promo-price); font-weight: 900; }
+
+.item-secao {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 10px 28px 4px;
+  border-top: 1px solid var(--border-card);
+  margin-top: 4px;
+  background: var(--bg-card);
+}
+
+.item-secao:first-child {
+  border-top: none;
+  margin-top: 0;
+}
+
+.item-loading {
+  padding: 20px 28px;
+  color: var(--text-muted);
+  font-size: 22px;
+  font-style: italic;
+  animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.item-preco-de {
+  font-size: 17px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  white-space: nowrap;
+  margin-right: 4px;
+  align-self: flex-end;
+  margin-bottom: 7px;
+}
+
+/* ====================================================
+   SIDEBAR — OFERTA DO DIA
+   ==================================================== */
+.sidebar-oferta {
+  background: var(--bg-page);
+  border: 2px solid var(--accent-oferta);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(232,48,48,0.14);
+}
+
+.sidebar-oferta::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--accent-oferta);
+  animation: borda-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes borda-pulse {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 0.15; }
+}
+
+/* Cabeçalho da sidebar: vermelho escuro com texto branco */
+.oferta-header {
+  background: #C0392B;
+  padding: 20px 20px 16px;
+  text-align: center;
+}
+
+.oferta-badge {
+  font-family: var(--font-display);
+  font-size: 38px;
+  letter-spacing: 2px;
+  color: #FFFFFF;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  line-height: 1;
+}
+
+.oferta-subtitulo {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.90);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.lista-ofertas {
+  list-style: none;
+  flex: 1;
+  overflow: hidden;
+  padding: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-page);
+}
+
+.oferta-item {
+  background: var(--bg-promo-card);
+  border: 1px solid rgba(232,48,48,0.25);
+  border-radius: var(--radius);
+  margin: 0 14px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: background 0.2s;
+  animation: slide-in 0.4s ease both;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.oferta-nome {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+
+.oferta-preco-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.oferta-preco-de {
+  font-size: 18px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+/* Preço final da sidebar: vermelho escuro — legível sobre fundo claro */
+.oferta-preco-por {
+  font-family: var(--font-display);
+  font-size: 52px;
+  color: var(--promo-price);
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.oferta-preco-kg {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--promo-price);
+  opacity: 0.8;
+  align-self: flex-end;
+  margin-bottom: 6px;
+}
+
+.oferta-categoria {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.oferta-vazio {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-muted);
+  font-size: 20px;
+  font-style: italic;
+}
+
+.oferta-rodape {
+  border-top: 1px solid rgba(232,48,48,0.15);
+  padding: 12px 20px;
+  text-align: center;
+  background: var(--bg-promo-card);
+}
+
+.oferta-rodape p {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.oferta-unidade {
+  font-size: 18px !important;
+  color: var(--promo-price) !important;
+  font-weight: 700 !important;
+  margin-top: 4px;
+}
+
+.oferta-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.oferta-badge-pct {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: #FFFFFF;
+  background: var(--accent-oferta);
+  border-radius: 6px;
+  padding: 1px 8px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+/* ====================================================
+   RODAPÉ FIXO — fundo branco
+   ==================================================== */
+.footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--footer-h);
+  background: #FFFFFF;
+  border-top: 1px solid #DEDBD6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  z-index: 100;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.04);
+}
+
+/* Faixa colorida no rodapé */
+.footer::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #5A8A1F 0%, #C4701A 50%, #E83030 100%);
+}
+
+.footer-text {
+  font-size: 16px;
+  color: #8A8785;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.footer-update {
+  font-size: 14px;
+  color: #8A8785;
+  letter-spacing: 1px;
+}
+
+/* ====================================================
+   SLIDE DOTS — visíveis sobre rodapé escuro
+   ==================================================== */
+.slide-dots {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slide-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #DEDBD6;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.35s, transform 0.35s;
+  outline: none;
+}
+
+.slide-dot:hover {
+  background: #F0EDE8;
+  transform: scale(1.15);
+}
+
+.slide-dot.active {
+  background: #E83030;
+  transform: scale(1.35);
+}
+
+/* ====================================================
+   UTILITÁRIOS SLIDE 0
+   ==================================================== */
+.lista-itens,
+.lista-ofertas {
+  transition: opacity 0.3s ease;
+}
+
+.lista-itens.atualizando,
+.lista-ofertas.atualizando {
+  opacity: 0;
+}
+
+/* ====================================================
+   SPOTLIGHT PAGES — TEMA CLARO
+   ==================================================== */
+.sp-page {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ====================================================
+   SPOTLIGHT HEADER
+   ==================================================== */
+.sp-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 40px 14px;
+  flex-shrink: 0;
+  border-bottom: 2px solid var(--border-card);
+}
+
+.sp-icon {
+  font-size: 52px;
+  line-height: 1;
+}
+
+.sp-titulo {
+  font-family: var(--font-display);
+  font-size: 54px;
+  letter-spacing: 4px;
+  line-height: 1;
+}
+
+/* Slide 1 – Bovinos */
+.sp-header-bovinos {
+  background: #4A7A15;
+  border-bottom: none;
+}
+.sp-header-bovinos .sp-titulo { color: #FFFFFF; }
+
+/* Slide 2 – Suínos */
+.sp-header-suinos {
+  background: #B5621A;
+  border-bottom: none;
+}
+.sp-header-suinos .sp-titulo { color: #FFFFFF; }
+
+/* Slide 2 – Aves */
+.sp-header-aves {
+  background: #1A6A9A;
+  border-bottom: none;
+}
+.sp-header-aves .sp-titulo { color: #FFFFFF; }
+
+/* ====================================================
+   SPOTLIGHT GRID DE CARDS
+   ==================================================== */
+.sp-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding: 18px 36px;
+  overflow: hidden;
+  align-content: stretch;
+  background: var(--bg-card-alt);
+}
+
+/* ====================================================
+   SPOTLIGHT CARD — light
+   ==================================================== */
+.sp-card {
+  background: var(--bg-page);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px 20px 14px 24px;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Barra colorida lateral esquerda */
+.sp-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 12px 0 0 12px;
+}
+
+.sp-bovinos-page .sp-card::before { background: var(--accent-bovinos); }
+.sp-half-suinos  .sp-card::before { background: var(--accent-suinos); }
+.sp-half-aves    .sp-card::before { background: var(--accent-aves); }
+
+.sp-card-nome {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-card-preco-de {
+  font-size: 16px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  line-height: 1;
+}
+
+.sp-card-preco {
+  font-family: var(--font-display);
+  font-size: 46px;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.sp-bovinos-page .sp-card-preco { color: var(--accent-bovinos); }
+.sp-half-suinos  .sp-card-preco { color: var(--accent-suinos); }
+.sp-half-aves    .sp-card-preco { color: var(--accent-aves); }
+
+.sp-card-kg {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.sp-card-promo-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 1px;
+  color: #FFFFFF;
+  background: var(--accent-oferta);
+  border-radius: 5px;
+  padding: 2px 8px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.sp-empty {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ====================================================
+   SLIDE 2 — SPLIT SUÍNOS & AVES
+   ==================================================== */
+.sp-split {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.sp-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.sp-divider {
+  width: 2px;
+  background: var(--border-card);
+  margin: 16px 0;
+  flex-shrink: 0;
+}
+
+.sp-half .sp-header {
+  padding: 14px 28px 12px;
+}
+
+.sp-half .sp-icon   { font-size: 44px; }
+.sp-half .sp-titulo { font-size: 46px; }
+
+.sp-half .sp-grid {
+  padding: 14px 24px;
+  gap: 12px;
+}
+
+/* ====================================================
+   SLIDE 3 — OFERTA DO DIA DESTAQUE TOTAL — light
+   ==================================================== */
+.sp-ofertas-page {
+  background: var(--bg-page);
+}
+
+.sp-ofertas-titulo {
+  font-family: var(--font-display);
+  font-size: 68px;
+  letter-spacing: 6px;
+  color: #FFFFFF;
+  background: #C0392B;
+  text-align: center;
+  padding: 20px 40px 16px;
+  flex-shrink: 0;
+}
+
+@keyframes ofertas-pulso {
+  0%, 100% { text-shadow: 0 2px 8px rgba(232,48,48,0.2); }
+  50%       { text-shadow: 0 2px 24px rgba(232,48,48,0.55); }
+}
+
+.sp-ofertas-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 16px 60px 24px;
+  overflow: hidden;
+  align-content: center;
+  background: var(--bg-page);
+}
+
+/* Card grande de oferta — light */
+.sp-oferta-card {
+  background: var(--bg-promo-card);
+  border: 2px solid var(--accent-oferta);
+  border-radius: 10px;
+  padding: 24px 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  min-height: 0;
+  box-shadow: 0 2px 12px rgba(232,48,48,0.10);
+}
+
+.sp-oferta-categoria {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sp-oferta-nome {
+  font-family: var(--font-body);
+  font-size: 38px;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.1;
+  letter-spacing: 0.3px;
+}
+
+.sp-oferta-preco-de {
+  font-size: 22px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.sp-oferta-preco-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* Preço final do spotlight de ofertas: vermelho escuro — NÃO amarelo */
+.sp-oferta-preco-por {
+  font-family: var(--font-display);
+  font-size: 60px;
+  color: var(--promo-price);
+  line-height: 1;
+  letter-spacing: 2px;
+}
+
+.sp-oferta-preco-kg {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--promo-price);
+  opacity: 0.75;
+  letter-spacing: 1px;
+  align-self: flex-end;
+  margin-bottom: 6px;
+}
+
+.sp-oferta-pct-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 1px;
+  color: #FFFFFF;
+  background: var(--accent-oferta);
+  border-radius: 8px;
+  padding: 3px 12px;
+  line-height: 1.2;
+}
+
+/* ====================================================
+   SLIDE 4 — OFERTAS DO DIA
+   ==================================================== */
+#slide-4 {
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+}
+
+.slide4-header {
+  background: #C0392B;
+  padding: 22px 40px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.slide4-titulo {
+  font-family: var(--font-display);
+  font-size: 52px;
+  letter-spacing: 4px;
+  color: #FFFFFF;
+  line-height: 1;
+  margin: 0;
+}
+
+.slide4-subtitulo {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.slide4-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 32px 40px;
+  flex: 1;
+  align-content: start;
+  overflow: hidden;
+}
+
+.slide4-card {
+  background: #FFF0F0;
+  border: 2px solid #E83030;
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 2px 12px rgba(232,48,48,0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slide4-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.slide4-categoria {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #8A8785;
+}
+
+.slide4-badge-pct {
+  font-family: var(--font-display);
+  font-size: 22px;
+  background: #E83030;
+  color: #FFFFFF;
+  border-radius: 6px;
+  padding: 2px 10px;
+  letter-spacing: 1px;
+}
+
+.slide4-nome {
+  font-family: var(--font-body);
+  font-size: 30px;
+  font-weight: 900;
+  color: #1A1A17;
+  line-height: 1.1;
+}
+
+.slide4-preco-de {
+  font-size: 18px;
+  color: #8A8785;
+  text-decoration: line-through;
+}
+
+.slide4-preco-final {
+  font-family: var(--font-display);
+  font-size: 58px;
+  color: #C0392B;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.slide4-preco-kg {
+  font-size: 18px;
+  font-weight: 700;
+  color: #C0392B;
+  opacity: 0.8;
+}
+
+.slide4-vazio {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8A8785;
+  font-size: 22px;
+  font-style: italic;
+  grid-column: 1 / -1;
+}

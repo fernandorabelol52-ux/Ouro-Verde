@@ -1,0 +1,817 @@
+/* ====================================================
+   MENU DIGITAL V2 – AÇOUGUE OURO VERDE
+   Tema: Painel Tradicional de Açougue Brasileiro
+   Branco · Vermelho · Verde · Dourado
+   ==================================================== */
+
+/* --- RESET --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- VARIÁVEIS --- */
+:root {
+  --vermelho:   #C0392B;
+  --vermelho2:  #8B1A1A;
+  --verde:      #2D7A1F;
+  --verde2:     #1a5010;
+  --dourado:    #C9A84C;
+  --branco:     #FFFFFF;
+  --cinza-leve: #fafaf8;
+  --cinza-brd:  #f0edea;
+  --cinza-brd2: #e0ddd8;
+  --cinza-txt:  #8A8785;
+  --texto:      #1A1A17;
+
+  --header-h:  68px;
+  --footer-h:  44px;
+  --font-disp: 'Bebas Neue', sans-serif;
+  --font-body: 'Barlow Condensed', sans-serif;
+}
+
+/* --- BASE --- */
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--branco);
+  color: var(--texto);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====================================================
+   CABEÇALHO FIXO
+   ==================================================== */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: var(--branco);
+  border-bottom: 2px solid var(--cinza-brd2);
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* Faixa decorativa topo */
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #C0392B, #C9A84C, #2D7A1F, #C9A84C, #C0392B);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 4px 32px 0;
+}
+
+.header-logo-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-logo-img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.store-name {
+  font-family: var(--font-disp);
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--vermelho);
+  line-height: 1;
+}
+
+.store-tagline {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--verde);
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.header-clock {
+  font-family: var(--font-disp);
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: var(--texto);
+  line-height: 1;
+}
+
+/* --- BADGE DE STATUS --- */
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--verde);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--verde);
+  transition: border-color 0.4s, color 0.4s;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4CAF50;
+  flex-shrink: 0;
+  transition: background 0.4s;
+}
+
+.status-badge.ok  .status-dot   { background: #4CAF50; animation: pulse-green 2s infinite; }
+.status-badge.ok  #status-text  { color: var(--verde); }
+.status-badge.err               { border-color: var(--vermelho); }
+.status-badge.err .status-dot   { background: var(--vermelho); }
+.status-badge.err #status-text  { color: var(--vermelho); }
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* ====================================================
+   SLIDES WRAPPER
+   ==================================================== */
+.slides-wrapper {
+  position: fixed;
+  top: var(--header-h);
+  bottom: var(--footer-h);
+  left: 0; right: 0;
+  z-index: 1;
+  overflow: hidden;
+  background: var(--branco);
+}
+
+/* --- SLIDE BASE --- */
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+  will-change: opacity;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ====================================================
+   HEADERS DE CATEGORIA — .cat-hdr
+   ==================================================== */
+.cat-hdr {
+  background: linear-gradient(135deg, var(--vermelho) 60%, var(--vermelho2) 100%);
+  padding: 9px 16px 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--dourado);
+  flex-shrink: 0;
+}
+
+.cat-hdr-aves {
+  background: linear-gradient(135deg, var(--verde) 60%, var(--verde2) 100%);
+}
+
+.cat-tit {
+  font-family: var(--font-disp);
+  font-size: 28px;
+  letter-spacing: 4px;
+  color: var(--branco);
+  line-height: 1;
+}
+
+.cat-sub {
+  font-family: var(--font-disp);
+  font-size: 10px;
+  color: var(--dourado);
+  letter-spacing: 2px;
+  align-self: flex-end;
+  margin-bottom: 2px;
+  line-height: 1;
+}
+
+/* ====================================================
+   SLIDE 0 — VISÃO GERAL
+   ==================================================== */
+.s0-layout {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 230px;
+}
+
+/* Coluna principal: bovinos + suínos empilhados */
+.s0-main {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  overflow: hidden;
+}
+
+.s0-section {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-bottom: 2px solid var(--cinza-brd2);
+}
+
+.s0-section:last-child {
+  border-bottom: none;
+}
+
+/* Sidebar de ofertas */
+.s0-sidebar {
+  border-left: 4px solid var(--dourado);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--branco);
+}
+
+/* ====================================================
+   LINHAS DE ITENS — lista-bovinos / lista-suinos
+   ==================================================== */
+.lista-itens {
+  list-style: none;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease;
+}
+
+.lista-itens.atualizando { opacity: 0; }
+
+.item-row {
+  display: flex;
+  align-items: center;
+  padding: 7px 16px;
+  border-bottom: 1px solid var(--cinza-brd);
+  gap: 6px;
+}
+
+.item-row:nth-child(even) { background: var(--cinza-leve); }
+.item-row:nth-child(odd)  { background: var(--branco); }
+
+.item-nome {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-dots {
+  flex: 1;
+  border-bottom: 1px dotted #ccc9c4;
+  margin: 0 6px;
+  min-width: 10px;
+}
+
+.item-preco-de {
+  font-size: 11px;
+  color: #bbb;
+  text-decoration: line-through;
+  margin-right: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.item-preco {
+  font-family: var(--font-disp);
+  font-size: 20px;
+  color: var(--texto);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+.item-unidade {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--cinza-txt);
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin-bottom: 3px;
+}
+
+.item-row.em-promo .item-nome  { color: var(--vermelho); }
+.item-row.em-promo .item-preco { color: var(--vermelho); }
+
+.item-secao {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--cinza-txt);
+  padding: 6px 16px 4px;
+  background: #f5f3f0;
+  border-top: 1px solid var(--cinza-brd2);
+  border-bottom: 1px solid var(--cinza-brd2);
+  flex-shrink: 0;
+}
+
+.item-secao:first-child {
+  border-top: none;
+  margin-top: 0;
+}
+
+.item-loading {
+  padding: 10px 16px;
+  color: var(--cinza-txt);
+  font-size: 12px;
+  font-style: italic;
+  animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ====================================================
+   SIDEBAR — OFERTA DO DIA (lista-ofertas)
+   ==================================================== */
+.sidebar-hdr {
+  background: linear-gradient(135deg, var(--vermelho) 60%, var(--vermelho2) 100%);
+  border-bottom: 3px solid var(--dourado);
+  padding: 10px 14px 8px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sidebar-hdr-txt {
+  font-family: var(--font-disp);
+  font-size: 20px;
+  letter-spacing: 3px;
+  color: var(--branco);
+  line-height: 1;
+}
+
+.lista-ofertas {
+  list-style: none;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease;
+}
+
+.lista-ofertas.atualizando { opacity: 0; }
+
+/* Primeiro card: destaque grande */
+.oferta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 14px 12px;
+  border-bottom: 3px solid var(--dourado);
+  flex: 1;
+  overflow: hidden;
+  background: var(--branco);
+}
+
+/* Cards subsequentes: mini */
+.oferta-item + .oferta-item {
+  flex: 0;
+  background: #FFF5F5;
+  border-bottom: none;
+  border-top: 3px solid var(--dourado);
+  padding: 10px 14px;
+}
+
+.oferta-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.oferta-categoria {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--verde);
+}
+
+/* Sem badge de percentual per spec */
+.oferta-badge-pct { display: none; }
+
+.oferta-nome {
+  font-family: var(--font-disp);
+  font-size: 24px;
+  color: var(--vermelho);
+  line-height: 1.1;
+  letter-spacing: 1px;
+}
+
+/* Linha dourada após o nome (primeiro item) */
+.oferta-item:first-child .oferta-nome::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--dourado), transparent);
+  margin: 6px 0 2px;
+}
+
+.oferta-preco-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.oferta-preco-de {
+  font-size: 12px;
+  color: #bbb;
+  text-decoration: line-through;
+}
+
+.oferta-preco-por {
+  font-family: var(--font-disp);
+  font-size: 36px;
+  color: var(--vermelho);
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.oferta-preco-kg {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--vermelho);
+  opacity: 0.8;
+  margin-left: 2px;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+
+.oferta-vazio {
+  padding: 20px 14px;
+  color: var(--cinza-txt);
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ====================================================
+   SPOTLIGHT PAGES (slides 1 e 2)
+   ==================================================== */
+.sp-page {
+  position: absolute;
+  inset: 0;
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ====================================================
+   SLIDE 1 — BOVINOS SPOTLIGHT (duas colunas de lista)
+   ==================================================== */
+.sp-bovinos-page .cat-hdr { flex-shrink: 0; }
+
+#sp-grid-bovinos {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: unset !important;
+  align-content: start;
+  overflow: hidden;
+  background: var(--branco);
+}
+
+/* Separador dourado central entre as duas colunas */
+#sp-grid-bovinos .sp-card:nth-child(odd) {
+  border-right: 3px solid var(--dourado);
+}
+
+/* ====================================================
+   SLIDE 2 — SUÍNOS & AVES SPLIT
+   ==================================================== */
+.sp-split {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.sp-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.sp-col-divider {
+  width: 3px;
+  background: var(--dourado);
+  flex-shrink: 0;
+}
+
+#sp-grid-suinos,
+#sp-grid-aves {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: unset !important;
+  align-content: start;
+  overflow: hidden;
+  background: var(--branco);
+}
+
+/* ====================================================
+   SP-CARD — estilos de lista para slides 1 e 2
+   ==================================================== */
+.sp-card {
+  display: flex;
+  align-items: center;
+  padding: 7px 16px;
+  border-bottom: 1px solid var(--cinza-brd);
+  gap: 6px;
+  background: var(--branco);
+}
+
+.sp-card:nth-child(even) { background: var(--cinza-leve); }
+
+.sp-card-promo-badge { display: none; } /* sem badge por spec */
+
+.sp-card-nome {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-card-preco-de {
+  font-size: 11px;
+  color: #bbb;
+  text-decoration: line-through;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sp-card-preco {
+  font-family: var(--font-disp);
+  font-size: 20px;
+  color: var(--texto);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+.sp-card-kg {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--cinza-txt);
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin-bottom: 3px;
+}
+
+/* Promo: vermelho quando há preço riscado */
+.sp-card:has(.sp-card-preco-de) .sp-card-nome  { color: var(--vermelho); }
+.sp-card:has(.sp-card-preco-de) .sp-card-preco { color: var(--vermelho); }
+
+.sp-empty {
+  padding: 16px;
+  color: var(--cinza-txt);
+  font-size: 13px;
+  font-style: italic;
+  grid-column: 1 / -1;
+}
+
+/* ====================================================
+   SLIDE 4 — OFERTAS DO DIA
+   ==================================================== */
+#slide-4 {
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+}
+
+.slide4-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--branco);
+}
+
+.slide4-header {
+  background: linear-gradient(135deg, var(--vermelho) 60%, var(--vermelho2) 100%);
+  border-bottom: 3px solid var(--dourado);
+  padding: 14px 40px 12px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.slide4-titulo {
+  font-family: var(--font-disp);
+  font-size: 42px;
+  letter-spacing: 6px;
+  color: var(--branco);
+  line-height: 1;
+  margin: 0;
+}
+
+.slide4-subtitulo {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.85);
+  margin-top: 4px;
+}
+
+.slide4-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 28px 48px;
+  flex: 1;
+  align-content: start;
+  overflow: hidden;
+}
+
+.slide4-card {
+  background: var(--branco);
+  border: 2px solid var(--vermelho);
+  border-top: 5px solid var(--vermelho);
+  border-radius: 10px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slide4-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.slide4-categoria {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--verde);
+}
+
+/* Sem badge de percentual per spec */
+.slide4-badge-pct { display: none; }
+
+.slide4-nome {
+  font-family: var(--font-disp);
+  font-size: 26px;
+  letter-spacing: 1px;
+  color: var(--texto);
+  line-height: 1.1;
+}
+
+/* Linha dourada separadora após o nome */
+.slide4-nome::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--dourado), transparent);
+  margin-top: 8px;
+}
+
+.slide4-preco-de {
+  font-size: 12px;
+  color: #bbb;
+  text-decoration: line-through;
+}
+
+.slide4-preco-final {
+  font-family: var(--font-disp);
+  font-size: 46px;
+  color: var(--vermelho);
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.slide4-preco-kg {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--vermelho);
+  opacity: 0.8;
+  margin-left: 4px;
+}
+
+.slide4-vazio {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--cinza-txt);
+  font-size: 16px;
+  font-style: italic;
+}
+
+/* ====================================================
+   RODAPÉ FIXO
+   ==================================================== */
+.footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--footer-h);
+  background: var(--branco);
+  border-top: 2px solid var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  z-index: 100;
+}
+
+.footer-text {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--cinza-txt);
+  letter-spacing: 0.5px;
+}
+
+.footer-update {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--cinza-txt);
+  letter-spacing: 0.5px;
+}
+
+/* ====================================================
+   SLIDE DOTS
+   ==================================================== */
+.slide-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slide-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cinza-brd2);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  outline: none;
+}
+
+.slide-dot:hover { background: #c0bcb8; transform: scale(1.1); }
+
+.slide-dot.active {
+  background: var(--vermelho);
+  transform: scale(1.25);
+}

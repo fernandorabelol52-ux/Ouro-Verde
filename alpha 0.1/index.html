@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Açougue Ouro Verde</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== CABEÇALHO FIXO ===== -->
+  <header class="header">
+    <div class="header-logo">
+      <img src="logo.png" alt="Açougue Ouro Verde" class="header-logo-img" />
+      <div class="header-title">
+        <p class="store-tagline">Carnes Frescas • Qualidade Garantida</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-date" id="relogio"></div>
+      <div class="status-badge" id="status-badge">
+        <span class="status-dot"></span>
+        <span id="status-text">Atualizando…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== ÁREA DE SLIDES ===== -->
+  <div class="slides-wrapper" id="slides-wrapper">
+
+    <!-- SLIDE 0: Visão Geral (3 colunas) -->
+    <div class="slide active" id="slide-0">
+      <div class="main-grid">
+
+        <section class="coluna" id="col-bovinos">
+          <div class="coluna-header bovinos-header">
+            <h2 class="coluna-titulo">BOVINOS</h2>
+          </div>
+          <ul class="lista-itens" id="lista-bovinos">
+            <li class="item-loading">Carregando…</li>
+          </ul>
+        </section>
+
+        <section class="coluna" id="col-suinos">
+          <div class="coluna-header suinos-header">
+            <h2 class="coluna-titulo">SUÍNOS & AVES</h2>
+          </div>
+          <ul class="lista-itens" id="lista-suinos">
+            <li class="item-loading">Carregando…</li>
+          </ul>
+        </section>
+
+        <aside class="sidebar-oferta" id="sidebar-oferta">
+          <div class="oferta-header">
+            <div class="oferta-badge">OFERTA DO DIA</div>
+            <p class="oferta-subtitulo">Aproveite enquanto durar!</p>
+          </div>
+          <ul class="lista-ofertas" id="lista-ofertas">
+            <li class="item-loading">Carregando…</li>
+          </ul>
+          <div class="oferta-rodape">
+            <p>Ofertas válidas somente hoje</p>
+            <p class="oferta-unidade">Preço por Kg</p>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- SLIDE 1: Bovinos Spotlight -->
+    <div class="slide" id="slide-1">
+      <div class="sp-page sp-bovinos-page">
+        <div class="sp-header sp-header-bovinos">
+          <h1 class="sp-titulo">BOVINOS — CORTES ESPECIAIS</h1>
+        </div>
+        <div class="sp-grid" id="sp-grid-bovinos"></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Suínos & Aves Split -->
+    <div class="slide" id="slide-2">
+      <div class="sp-page sp-suinos-aves-page">
+        <div class="sp-split">
+          <div class="sp-half sp-half-suinos">
+            <div class="sp-header sp-header-suinos">
+              <h2 class="sp-titulo">SUÍNOS</h2>
+            </div>
+            <div class="sp-grid" id="sp-grid-suinos"></div>
+          </div>
+          <div class="sp-divider"></div>
+          <div class="sp-half sp-half-aves">
+            <div class="sp-header sp-header-aves">
+              <h2 class="sp-titulo">AVES</h2>
+            </div>
+            <div class="sp-grid" id="sp-grid-aves"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Ofertas do Dia — Tela Dedicada -->
+    <div class="slide" id="slide-4">
+      <div class="slide4-header">
+        <h2 class="slide4-titulo">OFERTAS DO DIA</h2>
+        <p class="slide4-subtitulo">Aproveite enquanto durar!</p>
+      </div>
+      <div class="slide4-grid" id="slide4-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- ===== RODAPÉ FIXO ===== -->
+  <footer class="footer">
+    <p class="footer-text">💡 Preços atualizados automaticamente • Consulte nossos atendentes</p>
+    <div class="slide-dots" id="slide-dots"></div>
+    <p class="footer-update" id="ultima-atualizacao">—</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

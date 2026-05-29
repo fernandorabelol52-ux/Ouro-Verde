@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Açougue Ouro Verde</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style-v3.css" />
+</head>
+<body>
+
+  <!-- ===== CABEÇALHO FIXO ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-logo-group">
+        <img src="logo.png" class="header-logo-img" alt="Açougue Ouro Verde"/>
+        <div class="header-title">
+          <span class="store-name">AÇOUGUE OURO VERDE</span>
+          <span class="store-tagline">Carnes Frescas · Qualidade Garantida</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-clock" id="relogio"></div>
+        <div class="status-badge" id="status-badge">
+          <span class="status-dot"></span>
+          <span id="status-text">Atualizando…</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== SLIDES ===== -->
+  <div class="slides-wrapper" id="slides-wrapper">
+
+    <!-- SLIDE 0: BOVINOS — lista com coluna de fotos -->
+    <div class="slide active" id="slide-0">
+      <div class="s1-layout">
+
+        <!-- Coluna de fotos (160px) -->
+        <div class="s1-fotos" id="col-fotos-bovinos">
+          <!-- 3 imagens injetadas por criarImgComFallback() -->
+        </div>
+
+        <!-- Tabela de preços -->
+        <div class="s1-tabela">
+          <div class="cat-hdr">
+            <span class="cat-tit">BOVINOS</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="col-hdr">
+            <span>Descrição</span>
+            <span>R$/kg</span>
+          </div>
+          <ul class="lista-itens" id="lista-bovinos">
+            <li class="item-loading">Carregando…</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SLIDE 1: SUÍNOS & AVES — duas colunas com fotos -->
+    <div class="slide" id="slide-1">
+      <div class="s2-layout">
+
+        <!-- Metade Suínos -->
+        <div class="s2-half">
+          <div class="cat-hdr">
+            <span class="cat-tit">SUÍNOS</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="s2-content">
+            <div class="s2-fotos" id="col-fotos-suinos">
+              <!-- 2 imagens injetadas por criarImgComFallback() -->
+            </div>
+            <div id="sp-grid-suinos" class="sp-grid-v3"></div>
+          </div>
+        </div>
+
+        <!-- Separador dourado -->
+        <div class="s2-divider"></div>
+
+        <!-- Metade Aves -->
+        <div class="s2-half">
+          <div class="cat-hdr verde">
+            <span class="cat-tit">AVES</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="s2-content">
+            <div class="s2-fotos" id="col-fotos-aves">
+              <!-- 2 imagens injetadas por criarImgComFallback() -->
+            </div>
+            <div id="sp-grid-aves" class="sp-grid-v3"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SLIDE 2: OFERTA ESPECIAL DO DIA — carrossel interno -->
+    <div class="slide" id="slide-2">
+      <div class="s3-layout">
+
+        <!-- Coluna esquerda: foto -->
+        <div class="s3-foto-wrap" id="s3-foto-wrap">
+          <div class="s3-foto-overlay"></div>
+          <!-- .oferta-img injetada pelo carrossel -->
+        </div>
+
+        <!-- Coluna direita: informações -->
+        <div class="s3-info">
+          <div class="s3-label">OFERTA ESPECIAL DO DIA</div>
+          <div class="s3-dots" id="s3-dots"></div>
+          <div class="s3-categoria" id="s3-categoria"></div>
+          <div class="s3-nome" id="s3-nome"></div>
+          <div class="s3-linha"></div>
+          <div class="s3-preco-de" id="s3-preco-de"></div>
+          <div class="of-badge">
+            <span class="of-rs">R$</span>
+            <span class="of-reais" id="s3-reais">—</span>
+            <span class="of-cents" id="s3-cents"></span>
+            <span class="of-kg">/kg</span>
+          </div>
+          <div class="s3-validade">Oferta válida somente hoje</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== RODAPÉ FIXO ===== -->
+  <footer class="footer">
+    <p class="footer-text">Preços atualizados automaticamente · Consulte nossos atendentes</p>
+    <div class="slide-dots" id="slide-dots"></div>
+    <p class="footer-update" id="ultima-atualizacao">—</p>
+  </footer>
+
+  <!-- Elementos ocultos que app.js precisa para renderizar -->
+  <div class="hidden-targets" aria-hidden="true">
+    <ul id="lista-suinos"></ul>
+    <ul id="lista-ofertas"></ul>
+    <div id="sp-grid-bovinos"></div>
+    <div id="slide4-grid"></div>
+  </div>
+
+  <script src="app.js"></script>
+
+  <script>
+    /* ============================================================
+       V3 — OVERRIDES E LÓGICA DE FOTOS / CARROSSEL
+       ============================================================ */
+
+    // Override: rotação usa apenas os 3 slides v3
+    // getSlideList é function declaration → pode ser sobrescrita
+    getSlideList = function () {
+      return temPromocoes ? [0, 1, 2] : [0, 1];
+    };
+    renderDots(); // atualiza dots com a nova lista
+
+    /* ── INJEÇÃO DE IMAGENS — SLIDE 0 (Bovinos) ─────────────── */
+
+    function injetarImagensBovinos() {
+      const col = document.getElementById('col-fotos-bovinos');
+      if (!col || typeof criarImgComFallback !== 'function') return;
+      const itens = Array.from(document.querySelectorAll('#lista-bovinos .item-row'));
+      if (!itens.length) return;
+
+      const promos = itens.filter(el => el.classList.contains('em-promo'));
+      const fonte  = promos.length >= 3 ? promos : itens;
+      const nomes  = fonte.slice(0, 3)
+        .map(el => el.querySelector('.item-nome')?.textContent?.trim() || '')
+        .filter(Boolean);
+
+      col.innerHTML = '';
+      nomes.forEach(nome => {
+        const wrap = document.createElement('div');
+        wrap.className = 'foto-cell';
+        wrap.appendChild(criarImgComFallback(nome, 'foto-corte'));
+        col.appendChild(wrap);
+      });
+    }
+
+    /* ── INJEÇÃO DE IMAGENS — SLIDE 1 (Suínos / Aves) ───────── */
+
+    function injetarImagensGrid(gridId, colId) {
+      const col  = document.getElementById(colId);
+      const grid = document.getElementById(gridId);
+      if (!col || !grid || typeof criarImgComFallback !== 'function') return;
+
+      const cards = Array.from(grid.querySelectorAll('.sp-card'));
+      if (!cards.length) return;
+
+      const nomes = cards.slice(0, 2)
+        .map(el => el.querySelector('.sp-card-nome')?.textContent?.trim() || '')
+        .filter(Boolean);
+
+      col.innerHTML = '';
+      nomes.forEach(nome => {
+        const wrap = document.createElement('div');
+        wrap.className = 'foto-cell';
+        wrap.appendChild(criarImgComFallback(nome, 'foto-corte'));
+        col.appendChild(wrap);
+      });
+    }
+
+    /* ── OBSERVERS ───────────────────────────────────────────── */
+
+    const obsBovinos = new MutationObserver(() => injetarImagensBovinos());
+    obsBovinos.observe(document.getElementById('lista-bovinos'), { childList: true });
+
+    const obsSuinos = new MutationObserver(() => injetarImagensGrid('sp-grid-suinos', 'col-fotos-suinos'));
+    obsSuinos.observe(document.getElementById('sp-grid-suinos'), { childList: true });
+
+    const obsAves = new MutationObserver(() => injetarImagensGrid('sp-grid-aves', 'col-fotos-aves'));
+    obsAves.observe(document.getElementById('sp-grid-aves'), { childList: true });
+
+    // Guarda contra condição de corrida (dados já carregados antes do observer)
+    injetarImagensBovinos();
+    injetarImagensGrid('sp-grid-suinos', 'col-fotos-suinos');
+    injetarImagensGrid('sp-grid-aves', 'col-fotos-aves');
+
+    /* ── CARROSSEL — SLIDE 2 (Oferta Especial) ───────────────── */
+
+    let v3OfertaIdx   = 0;
+    let v3OfertaTimer = null;
+    let v3Ofertas     = [];
+
+    function v3ParsePreco(str) {
+      const limpo = (str || '').replace('R$', '').trim();
+      const m = limpo.match(/^(\d+)[,.](\d{2})/);
+      if (!m) return { reais: '—', cents: '' };
+      return { reais: m[1], cents: ',' + m[2] };
+    }
+
+    function v3AtualizarDots() {
+      const container = document.getElementById('s3-dots');
+      if (!container) return;
+      if (v3Ofertas.length <= 1) {
+        container.style.display = 'none';
+        return;
+      }
+      container.style.display = 'flex';
+      container.innerHTML = '';
+      v3Ofertas.forEach((_, i) => {
+        const dot = document.createElement('span');
+        dot.className = 's3-dot' + (i === v3OfertaIdx ? ' ativa' : '');
+        container.appendChild(dot);
+      });
+    }
+
+    function v3AplicarConteudo() {
+      if (!v3Ofertas.length) return;
+      const item = v3Ofertas[v3OfertaIdx];
+
+      const nome    = item.querySelector('.oferta-nome')?.textContent?.trim()      || '';
+      const precoFn = item.querySelector('.oferta-preco-por')?.textContent?.trim() || '';
+      const precoDe = item.querySelector('.oferta-preco-de')?.textContent?.trim()  || '';
+      const cat     = item.querySelector('.oferta-categoria')?.textContent?.trim() || '';
+
+      const catEl   = document.getElementById('s3-categoria');
+      const nomeEl  = document.getElementById('s3-nome');
+      const deEl    = document.getElementById('s3-preco-de');
+      const reaisEl = document.getElementById('s3-reais');
+      const centsEl = document.getElementById('s3-cents');
+      const fotoEl  = document.getElementById('s3-foto-wrap');
+
+      if (catEl)   catEl.textContent  = cat;
+      if (nomeEl)  nomeEl.textContent = nome;
+
+      if (deEl) {
+        if (precoDe) {
+          deEl.textContent    = 'De: ' + precoDe;
+          deEl.style.display  = '';
+        } else {
+          deEl.style.display  = 'none';
+        }
+      }
+
+      const { reais, cents } = v3ParsePreco(precoFn);
+      if (reaisEl) reaisEl.textContent = reais;
+      if (centsEl) centsEl.textContent = cents;
+
+      if (fotoEl) {
+        // Remove imagem/placeholder anterior, mantém overlay
+        Array.from(fotoEl.children).forEach(c => {
+          if (!c.classList.contains('s3-foto-overlay')) c.remove();
+        });
+        const img = criarImgComFallback(nome, 'oferta-img');
+        fotoEl.insertBefore(img, fotoEl.firstChild);
+      }
+
+      v3AtualizarDots();
+    }
+
+    function v3MostrarOferta(idx, comFade) {
+      if (!v3Ofertas.length) return;
+      v3OfertaIdx = ((idx % v3Ofertas.length) + v3Ofertas.length) % v3Ofertas.length;
+
+      const infoEl = document.querySelector('.s3-info');
+      const fotoEl = document.getElementById('s3-foto-wrap');
+
+      if (!comFade) {
+        if (infoEl) { infoEl.style.transition = 'none'; infoEl.style.opacity = '1'; infoEl.style.transform = 'translateX(0)'; }
+        if (fotoEl) { fotoEl.style.transition  = 'none'; fotoEl.style.opacity  = '1'; }
+        v3AplicarConteudo();
+        return;
+      }
+
+      // Fade out
+      if (infoEl) { infoEl.style.transition = 'opacity 0.4s ease, transform 0.4s ease'; infoEl.style.opacity = '0'; infoEl.style.transform = 'translateX(20px)'; }
+      if (fotoEl) { fotoEl.style.transition  = 'opacity 0.4s ease'; fotoEl.style.opacity  = '0'; }
+
+      setTimeout(() => {
+        v3AplicarConteudo();
+        // Fade in
+        if (infoEl) { infoEl.style.opacity = '1'; infoEl.style.transform = 'translateX(0)'; }
+        if (fotoEl) { fotoEl.style.opacity  = '1'; }
+      }, 420);
+    }
+
+    function v3IniciarCarrossel() {
+      clearInterval(v3OfertaTimer);
+      if (!v3Ofertas.length) return;
+
+      v3MostrarOferta(0, false);
+
+      if (v3Ofertas.length > 1) {
+        v3OfertaTimer = setInterval(() => {
+          v3MostrarOferta(v3OfertaIdx + 1, true);
+        }, 4000);
+      }
+    }
+
+    const obsOfertas = new MutationObserver(() => {
+      v3Ofertas = Array.from(document.querySelectorAll('#lista-ofertas .oferta-item'));
+      v3IniciarCarrossel();
+    });
+    obsOfertas.observe(document.getElementById('lista-ofertas'), { childList: true });
+
+    // Guarda contra condição de corrida
+    v3Ofertas = Array.from(document.querySelectorAll('#lista-ofertas .oferta-item'));
+    if (v3Ofertas.length) v3IniciarCarrossel();
+
+  </script>
+</body>
+</html>

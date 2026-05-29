@@ -1,0 +1,737 @@
+/* ====================================================
+   MENU DIGITAL V3 – AÇOUGUE OURO VERDE
+   Tema: Painel com Fotos · Branco · Vermelho · Verde · Dourado
+   ==================================================== */
+
+/* --- RESET --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- VARIÁVEIS --- */
+:root {
+  --vm:   #C0392B;
+  --vm2:  #8B1A1A;
+  --vd:   #2D7A1F;
+  --vd2:  #1a5010;
+  --ou:   #C9A84C;
+  --bg:   #FFFFFF;
+  --bg2:  #fafaf8;
+  --brd:  #f0edea;
+  --brd2: #e0ddd8;
+  --txt:  #1A1A17;
+  --txt2: #8A8785;
+
+  --header-h:  68px;
+  --footer-h:  44px;
+  --font-disp: 'Bebas Neue', sans-serif;
+  --font-body: 'Barlow Condensed', sans-serif;
+}
+
+/* --- BASE --- */
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====================================================
+   CABEÇALHO FIXO
+   ==================================================== */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: var(--bg);
+  border-bottom: 2px solid var(--brd2);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--vm), var(--ou), var(--vd), var(--ou), var(--vm));
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 4px 32px 0;
+}
+
+.header-logo-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-logo-img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.store-name {
+  font-family: var(--font-disp);
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--vm);
+  line-height: 1;
+}
+
+.store-tagline {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--vd);
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.header-clock {
+  font-family: var(--font-disp);
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: var(--txt);
+  line-height: 1;
+}
+
+/* --- BADGE DE STATUS --- */
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--vd);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--vd);
+  transition: border-color 0.4s, color 0.4s;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4CAF50;
+  flex-shrink: 0;
+  transition: background 0.4s;
+}
+
+.status-badge.ok  .status-dot   { background: #4CAF50; animation: pulse-green 2s infinite; }
+.status-badge.ok  #status-text  { color: var(--vd); }
+.status-badge.err               { border-color: var(--vm); }
+.status-badge.err .status-dot   { background: var(--vm); }
+.status-badge.err #status-text  { color: var(--vm); }
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* ====================================================
+   SLIDES WRAPPER
+   ==================================================== */
+.slides-wrapper {
+  position: fixed;
+  top: var(--header-h);
+  bottom: var(--footer-h);
+  left: 0; right: 0;
+  z-index: 1;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+  will-change: opacity;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ====================================================
+   HEADERS DE CATEGORIA
+   ==================================================== */
+.cat-hdr {
+  background: linear-gradient(135deg, var(--vm) 60%, var(--vm2) 100%);
+  padding: 9px 16px 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--ou);
+  flex-shrink: 0;
+}
+
+.cat-hdr.verde {
+  background: linear-gradient(135deg, var(--vd), var(--vd2));
+}
+
+.cat-tit {
+  font-family: var(--font-disp);
+  font-size: 26px;
+  letter-spacing: 4px;
+  color: #fff;
+  line-height: 1;
+}
+
+.cat-sub {
+  font-family: var(--font-disp);
+  font-size: 10px;
+  color: var(--ou);
+  letter-spacing: 2px;
+  align-self: flex-end;
+  margin-bottom: 2px;
+  line-height: 1;
+}
+
+/* ====================================================
+   LISTA-ITENS — BASE
+   ==================================================== */
+.lista-itens {
+  list-style: none;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease;
+}
+
+.lista-itens.atualizando { opacity: 0; }
+
+.item-loading {
+  padding: 10px 16px;
+  color: var(--txt2);
+  font-size: 12px;
+  font-style: italic;
+  animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.item-secao {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--txt2);
+  padding: 5px 14px 3px;
+  background: #f5f3f0;
+  border-top: 1px solid var(--brd2);
+  border-bottom: 1px solid var(--brd2);
+  flex-shrink: 0;
+}
+
+/* ====================================================
+   COMPACT ITEM ROW — used in all list slides
+   ==================================================== */
+.item-row {
+  display: flex;
+  align-items: center;
+  padding: 5px 14px;
+  gap: 6px;
+  border-bottom: 1px solid var(--brd);
+  flex-shrink: 0;
+}
+
+.item-row:nth-child(even) { background: var(--bg2); }
+.item-row:nth-child(odd)  { background: var(--bg); }
+
+.item-nome {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--txt);
+  text-transform: uppercase;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-dots {
+  flex: 1;
+  border-bottom: 1px dotted #ccc9c4;
+  margin: 0 4px;
+  min-width: 8px;
+}
+
+.item-preco-de {
+  font-size: 11px;
+  color: var(--txt2);
+  text-decoration: line-through;
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.item-preco {
+  font-family: var(--font-disp);
+  font-size: 21px;
+  color: var(--txt);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.item-unidade {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--txt2);
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+
+.item-row.em-promo .item-nome  { color: var(--vm); }
+.item-row.em-promo .item-preco { color: var(--vm); }
+
+/* ====================================================
+   FOTO COMPONENTS — shared
+   ==================================================== */
+.foto-cell {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-height: 0;
+}
+
+.foto-corte {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  filter: brightness(0.88);
+  display: block;
+}
+
+.foto-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--bg2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-disp);
+  font-size: 28px;
+  color: var(--brd2);
+}
+
+/* ====================================================
+   SLIDE 0 — BOVINOS
+   ==================================================== */
+.s1-layout {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 160px 1fr;
+}
+
+.s1-fotos {
+  background: var(--bg);
+  border-right: 3px solid var(--ou);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.s1-tabela {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.col-hdr {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 14px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--txt2);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--brd2);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* ====================================================
+   SLIDE 1 — SUÍNOS & AVES
+   ==================================================== */
+.s2-layout {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 3px 1fr;
+}
+
+.s2-divider {
+  background: var(--ou);
+}
+
+.s2-half {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.s2-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 75px 1fr;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.s2-fotos {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  border-right: 2px solid var(--brd2);
+}
+
+/* sp-grid-v3: compact list for suinos/aves */
+.sp-grid-v3 {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.sp-grid-v3 .sp-card {
+  display: flex;
+  align-items: center;
+  padding: 5px 14px;
+  gap: 6px;
+  border-bottom: 1px solid var(--brd);
+  flex-shrink: 0;
+}
+
+.sp-grid-v3 .sp-card:nth-child(even) { background: var(--bg2); }
+.sp-grid-v3 .sp-card:nth-child(odd)  { background: var(--bg); }
+
+.sp-grid-v3 .sp-card-promo-badge { display: none; }
+
+.sp-grid-v3 .sp-card-nome {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--txt);
+  text-transform: uppercase;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sp-grid-v3 .sp-card-preco-de {
+  font-size: 11px;
+  color: var(--txt2);
+  text-decoration: line-through;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.sp-grid-v3 .sp-card-preco {
+  font-family: var(--font-disp);
+  font-size: 21px;
+  color: var(--txt);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sp-grid-v3 .sp-card-kg {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--txt2);
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+
+.sp-grid-v3 .sp-card:has(.sp-card-preco-de) .sp-card-nome  { color: var(--vm); }
+.sp-grid-v3 .sp-card:has(.sp-card-preco-de) .sp-card-preco { color: var(--vm); }
+
+.sp-empty {
+  padding: 16px;
+  color: var(--txt2);
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* ====================================================
+   SLIDE 2 — FEATURED OFFER CAROUSEL
+   ==================================================== */
+.s3-layout {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Left: full-height photo */
+.s3-foto-wrap {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg2);
+}
+
+.oferta-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.82) contrast(1.1);
+  display: block;
+}
+
+.s3-foto-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 55%, #FFFFFF 95%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Right: info column */
+.s3-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 60px 48px 40px;
+  gap: 14px;
+  background: var(--bg);
+}
+
+.s3-label {
+  font-family: var(--font-disp);
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: var(--ou);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.s3-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.s3-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brd2);
+  display: inline-block;
+  transition: background 0.3s;
+}
+
+.s3-dot.ativa {
+  background: var(--vm);
+  transform: scale(1.2);
+}
+
+.s3-categoria {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--vd);
+  line-height: 1;
+}
+
+.s3-nome {
+  font-family: var(--font-disp);
+  font-size: 48px;
+  letter-spacing: 2px;
+  color: var(--txt);
+  line-height: 1.05;
+}
+
+.s3-linha {
+  width: 60px;
+  height: 3px;
+  background: var(--ou);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.s3-preco-de {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--txt2);
+  text-decoration: line-through;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Price badge */
+.of-badge {
+  background: var(--vm);
+  border: 2px solid var(--ou);
+  border-radius: 10px;
+  padding: 10px 20px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  align-self: flex-start;
+}
+
+.of-rs {
+  font-family: var(--font-disp);
+  font-size: 18px;
+  color: #fff;
+  line-height: 1;
+}
+
+.of-reais {
+  font-family: var(--font-disp);
+  font-size: 56px;
+  color: #fff;
+  line-height: 1;
+}
+
+.of-cents {
+  font-family: var(--font-disp);
+  font-size: 24px;
+  color: #fff;
+  align-self: flex-start;
+  margin-top: 6px;
+}
+
+.of-kg {
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.75);
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+
+.s3-validade {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--txt2);
+  line-height: 1;
+}
+
+/* ====================================================
+   HIDDEN APP.JS TARGETS (lista-ofertas, slide4-grid etc.)
+   ==================================================== */
+.hidden-targets {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Preserve existing class styles so app.js renders don't error */
+.lista-ofertas,
+.lista-suinos-hidden {
+  list-style: none;
+}
+
+.oferta-item,
+.slide4-card,
+.sp-card { display: block; }
+
+/* ====================================================
+   RODAPÉ FIXO
+   ==================================================== */
+.footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--footer-h);
+  background: var(--bg);
+  border-top: 2px solid var(--ou);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  z-index: 100;
+}
+
+.footer-text,
+.footer-update {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--txt2);
+  letter-spacing: 0.5px;
+}
+
+/* ====================================================
+   SLIDE DOTS
+   ==================================================== */
+.slide-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slide-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brd2);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  outline: none;
+}
+
+.slide-dot:hover { background: #c0bcb8; transform: scale(1.1); }
+
+.slide-dot.active {
+  background: var(--vm);
+  transform: scale(1.25);
+}

@@ -521,9 +521,13 @@
       owner:         'fernandorabelol52-ux',
       repo:          'Ouro-Verde',
       branch:        'main',
-      fotosJsonPath: 'Vers%C3%A3o%201.0/fotos.json',
-      imagensPath:   'Vers%C3%A3o%201.0/imagens/',
+      fotosJsonPath: 'Versão 1.0/fotos.json',
+      imagensPath:   'Versão 1.0/imagens/',
     };
+
+    function encodePath(path) {
+      return path.split('/').map(segment => encodeURIComponent(segment)).join('/');
+    }
 
     const SHEET_CSV_URL =
       'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEq8oeTNFgdAnWZIGOrmoU8QO7WqlMAyvXLPS5rToesYvZdNaoJAgj3pyVcNpPHo8Sk4ty_IukrWt9/pub?gid=232780593&single=true&output=csv';
@@ -658,10 +662,11 @@
        GITHUB API
     ══════════════════════════════════════════════ */
     async function getFileSHA(path) {
-      const resp = await fetch(
-        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`,
-        { headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' } }
-      );
+      const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`;
+      console.log('[GitHub] getFileSHA URL:', url);
+      const resp = await fetch(url, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
       if (resp.status === 404) return null;
       const data = await resp.json();
       return data.sha || null;
@@ -672,7 +677,7 @@
       const body = { message: mensagem, content: base64Content, branch: GITHUB_CONFIG.branch };
       if (sha) body.sha = sha;
       const resp = await fetch(
-        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`,
+        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`,
         {
           method:  'PUT',
           headers: {
@@ -699,13 +704,13 @@
     async function uploadImagem(nomeArquivo, base64Puro) {
       const path = GITHUB_CONFIG.imagensPath + nomeArquivo;
       await uploadArquivo(path, base64Puro, `foto: ${nomeArquivo}`);
-      return `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${path}`;
+      return `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${encodePath(path)}`;
     }
 
     async function carregarFotosJsonAtual() {
       try {
         const resp = await fetch(
-          `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.fotosJsonPath}`,
+          `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(GITHUB_CONFIG.fotosJsonPath)}`,
           { headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' } }
         );
         if (resp.status === 404) return { versao: new Date().toISOString(), fallback: 'logo.png', itens: {} };

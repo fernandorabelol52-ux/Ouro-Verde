@@ -525,8 +525,9 @@
       imagensPath:   'Versão 1.0/imagens/',
     };
 
-    function encodePath(path) {
-      return path.split('/').map(segment => encodeURIComponent(segment)).join('/');
+    // Encode each path segment separately so '/' stays literal
+    function encodePath(p) {
+      return p.split('/').map(s => encodeURIComponent(s)).join('/');
     }
 
     const SHEET_CSV_URL =
@@ -662,11 +663,10 @@
        GITHUB API
     ══════════════════════════════════════════════ */
     async function getFileSHA(path) {
-      const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`;
-      console.log('[GitHub] getFileSHA URL:', url);
-      const resp = await fetch(url, {
-        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
-      });
+      const resp = await fetch(
+        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`,
+        { headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' } }
+      );
       if (resp.status === 404) return null;
       const data = await resp.json();
       return data.sha || null;

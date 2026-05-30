@@ -85,9 +85,14 @@ async function carregarFotos() {
     const resp = await fetch(FOTOS_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
     if (!resp.ok) throw new Error('fotos.json not found');
     const dados = await resp.json();
-    FOTOS_MAP      = dados.itens      || {};
-    FOTO_FALLBACK  = dados.fallback   || 'logo.png';
-    CATEGORIAS_MAP = dados.categorias || {};
+    FOTOS_MAP     = dados.itens    || {};
+    FOTO_FALLBACK = dados.fallback || 'logo.png';
+    // Normalize category keys (strip accents) so 'Suínos' and 'Suinos' both resolve to 'Suinos'
+    CATEGORIAS_MAP = {};
+    for (const [k, v] of Object.entries(dados.categorias || {})) {
+      const kNorm = k.normalize('NFD').replace(/[̀-ͯ]/g, '');
+      CATEGORIAS_MAP[kNorm] = v;
+    }
     console.info('[Fotos] Loaded:', Object.keys(FOTOS_MAP).length, 'photos,', Object.keys(CATEGORIAS_MAP).length, 'categorias');
   } catch (e) {
     console.warn('[Fotos] Using fallback:', e.message);

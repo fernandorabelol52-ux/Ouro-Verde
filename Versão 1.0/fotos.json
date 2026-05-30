@@ -1,5 +1,5 @@
 {
-  "versao": "2026-05-30T15:03:00.677Z",
+  "versao": "2026-05-30T15:18:06.568Z",
   "fallback": "logo.png",
   "itens": {
     "Sobrecoxa": {
@@ -21,6 +21,10 @@
     "Maminha": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/maminha.jpeg",
       "alt": "Maminha — Açougue Ouro Verde"
+    },
+    "Peito de Frango": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/peito-de-frango.jpeg",
+      "alt": "Peito de Frango — Açougue Ouro Verde"
     }
   }
 }

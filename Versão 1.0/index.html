@@ -149,6 +149,18 @@
 
   <script src="app.js"></script>
 
+  <style>
+    /* Garante que a foto de categoria preencha toda a coluna */
+    #col-fotos-bovinos,
+    #col-fotos-suinos,
+    #col-fotos-aves {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+    }
+  </style>
+
   <script>
     /* ============================================================
        V3 — OVERRIDES E LÓGICA DE FOTOS / CARROSSEL
@@ -166,6 +178,20 @@
     function injetarImagensBovinos() {
       const col = document.getElementById('col-fotos-bovinos');
       if (!col || typeof criarImgComFallback !== 'function') return;
+
+      // Categoria tem prioridade: uma única imagem que cobre a coluna inteira
+      const catFoto = CATEGORIAS_MAP['Bovinos']?.foto;
+      if (catFoto) {
+        col.innerHTML = '';
+        const img = document.createElement('img');
+        img.src   = catFoto;
+        img.alt   = 'Bovinos — Açougue Ouro Verde';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;flex:1;';
+        col.appendChild(img);
+        return;
+      }
+
+      // Fallback: fotos individuais dos cortes
       const itens = Array.from(document.querySelectorAll('#lista-bovinos .item-row'));
       if (!itens.length) return;
 
@@ -191,6 +217,21 @@
       const grid = document.getElementById(gridId);
       if (!col || !grid || typeof criarImgComFallback !== 'function') return;
 
+      // Categoria tem prioridade: uma única imagem que cobre a coluna inteira
+      const catNomePorCol = { 'col-fotos-suinos': 'Suinos', 'col-fotos-aves': 'Aves' };
+      const catNome = catNomePorCol[colId];
+      const catFoto = catNome && CATEGORIAS_MAP[catNome]?.foto;
+      if (catFoto) {
+        col.innerHTML = '';
+        const img = document.createElement('img');
+        img.src   = catFoto;
+        img.alt   = `${catNome} — Açougue Ouro Verde`;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;flex:1;';
+        col.appendChild(img);
+        return;
+      }
+
+      // Fallback: fotos individuais dos cortes
       const cards = Array.from(grid.querySelectorAll('.sp-card'));
       if (!cards.length) return;
 

@@ -38,8 +38,9 @@ let isTransitioning     = false;
 let pendingData         = {};     // { idx: dados } — aguarda slide sair
 
 /* ── FOTOS (V3) ── */
-let FOTOS_MAP    = {};
-let FOTO_FALLBACK = 'logo.png';
+let FOTOS_MAP      = {};
+let FOTO_FALLBACK  = 'logo.png';
+let CATEGORIAS_MAP = {};   // { Bovinos: { foto }, Suinos: { foto }, Aves: { foto } }
 
 /* ============================================================
    RELÓGIO
@@ -84,9 +85,10 @@ async function carregarFotos() {
     const resp = await fetch(FOTOS_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
     if (!resp.ok) throw new Error('fotos.json not found');
     const dados = await resp.json();
-    FOTOS_MAP     = dados.itens    || {};
-    FOTO_FALLBACK = dados.fallback || 'logo.png';
-    console.info('[Fotos] Loaded:', Object.keys(FOTOS_MAP).length, 'photos');
+    FOTOS_MAP      = dados.itens      || {};
+    FOTO_FALLBACK  = dados.fallback   || 'logo.png';
+    CATEGORIAS_MAP = dados.categorias || {};
+    console.info('[Fotos] Loaded:', Object.keys(FOTOS_MAP).length, 'photos,', Object.keys(CATEGORIAS_MAP).length, 'categorias');
   } catch (e) {
     console.warn('[Fotos] Using fallback:', e.message);
     FOTOS_MAP = {};

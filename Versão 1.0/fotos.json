@@ -1,5 +1,5 @@
 {
-  "versao": "2026-05-30T15:29:44.442Z",
+  "versao": "2026-05-30T15:38:06.914Z",
   "fallback": "logo.png",
   "itens": {
     "Sobrecoxa": {
@@ -29,6 +29,10 @@
     "Contra-filé": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/contra-file.jpeg",
       "alt": "Contra-filé — Açougue Ouro Verde"
+    },
+    "Bisteca Suina": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/bisteca-suina.jpeg",
+      "alt": "Bisteca Suina — Açougue Ouro Verde"
     }
   }
 }

@@ -521,8 +521,8 @@
       owner:         'fernandorabelol52-ux',
       repo:          'Ouro-Verde',
       branch:        'main',
-      fotosJsonPath: 'Versão 1.0/fotos.json',
-      imagensPath:   'imagens/',
+      fotosJsonPath: 'Vers%C3%A3o%201.0/fotos.json',
+      imagensPath:   'Vers%C3%A3o%201.0/imagens/',
     };
 
     const SHEET_CSV_URL =
@@ -659,7 +659,7 @@
     ══════════════════════════════════════════════ */
     async function getFileSHA(path) {
       const resp = await fetch(
-        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodeURIComponent(path)}`,
+        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`,
         { headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' } }
       );
       if (resp.status === 404) return null;
@@ -672,7 +672,7 @@
       const body = { message: mensagem, content: base64Content, branch: GITHUB_CONFIG.branch };
       if (sha) body.sha = sha;
       const resp = await fetch(
-        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodeURIComponent(path)}`,
+        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`,
         {
           method:  'PUT',
           headers: {
@@ -705,7 +705,7 @@
     async function carregarFotosJsonAtual() {
       try {
         const resp = await fetch(
-          `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodeURIComponent(GITHUB_CONFIG.fotosJsonPath)}`,
+          `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.fotosJsonPath}`,
           { headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' } }
         );
         if (resp.status === 404) return { versao: new Date().toISOString(), fallback: 'logo.png', itens: {} };

@@ -332,6 +332,34 @@
     .card-cat.suinos  { color: #C4701A; }
     .card-cat.aves    { color: #2A7FAE; }
 
+    /* ─── REMOVE BUTTON ─────────────────────── */
+    .btn-remover {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(192,57,43,0.92);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      line-height: 1;
+      transition: background 0.15s, transform 0.15s;
+      padding: 0;
+    }
+
+    .btn-remover:hover {
+      background: var(--vm2);
+      transform: scale(1.15);
+    }
+
     /* ─── LOADING STATE ──────────────────────── */
     .loading-msg {
       text-align: center;
@@ -477,6 +505,9 @@
       </div>
     </div>
 
+    <div class="section-title">Fotos de Categoria</div>
+    <div class="grade" id="grade-categorias"></div>
+
     <div class="section-title">Gerenciar Fotos</div>
     <div class="grade" id="grade-cortes">
       <div class="loading-msg">Carregando cardápio…</div>
@@ -538,7 +569,15 @@
     ══════════════════════════════════════════════ */
     let cortesLista    = [];
     let fotosMap       = {};
+    let categoriasMap  = {};
     let corteAtivoNome = null;
+    let corteAtivoTipo = 'item'; // 'item' | 'categoria'
+
+    const CATEGORIAS = [
+      { nome: 'Bovinos', slug: 'cat-bovinos', label: 'Slide 1 — Col. esquerda' },
+      { nome: 'Suinos',  slug: 'cat-suinos',  label: 'Slide 2 — Lado esquerdo' },
+      { nome: 'Aves',    slug: 'cat-aves',    label: 'Slide 2 — Lado direito'  },
+    ];
 
     /* ══════════════════════════════════════════════
        TOKEN
@@ -713,12 +752,12 @@
           `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(GITHUB_CONFIG.fotosJsonPath)}`,
           { headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' } }
         );
-        if (resp.status === 404) return { versao: new Date().toISOString(), fallback: 'logo.png', itens: {} };
+        if (resp.status === 404) return { versao: new Date().toISOString(), fallback: 'logo.png', categorias: {}, itens: {} };
         const data    = await resp.json();
         const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
         return JSON.parse(decoded);
       } catch {
-        return { versao: new Date().toISOString(), fallback: 'logo.png', itens: {} };
+        return { versao: new Date().toISOString(), fallback: 'logo.png', categorias: {}, itens: {} };
       }
     }
 
@@ -783,6 +822,13 @@
           img.alt       = nome;
           img.onerror   = () => { img.style.display = 'none'; };
           fotoArea.appendChild(img);
+
+          const btnRem       = document.createElement('button');
+          btnRem.className   = 'btn-remover';
+          btnRem.title       = 'Remover foto';
+          btnRem.textContent = '✕';
+          btnRem.addEventListener('click', e => { e.stopPropagation(); removerFoto(nome, 'item'); });
+          fotoArea.appendChild(btnRem);
         } else {
           const ph       = document.createElement('div');
           ph.className   = 'card-placeholder';
@@ -802,7 +848,7 @@
         }
         fotoArea.appendChild(overlay);
 
-        fotoArea.addEventListener('click', () => selecionarFoto(nome));
+        fotoArea.addEventListener('click', () => selecionarFoto(nome, 'item'));
         card.appendChild(fotoArea);
 
         const info     = document.createElement('div');
@@ -817,11 +863,90 @@
       });
     }
 
+    function renderizarCategorias() {
+      const grade = document.getElementById('grade-categorias');
+      grade.innerHTML = '';
+      CATEGORIAS.forEach(({ nome, label }) => {
+        const fotoData = categoriasMap[nome];
+        const temFoto  = !!(fotoData && fotoData.foto);
+
+        const card = document.createElement('div');
+        let classes = 'card';
+        if (temFoto)         classes += ' tem-foto';
+        if (fotoData?.isNew) classes += ' nova-foto';
+        if (!temFoto)        classes += ' sem-foto';
+        card.className = classes;
+
+        const fotoArea = document.createElement('div');
+        fotoArea.className = 'card-foto-area';
+
+        if (temFoto) {
+          const img     = document.createElement('img');
+          img.src       = fotoData.foto;
+          img.className = 'card-foto';
+          img.alt       = nome;
+          img.onerror   = () => { img.style.display = 'none'; };
+          fotoArea.appendChild(img);
+
+          const btnRem       = document.createElement('button');
+          btnRem.className   = 'btn-remover';
+          btnRem.title       = 'Remover foto';
+          btnRem.textContent = '✕';
+          btnRem.addEventListener('click', e => { e.stopPropagation(); removerFoto(nome, 'categoria'); });
+          fotoArea.appendChild(btnRem);
+        } else {
+          const ph       = document.createElement('div');
+          ph.className   = 'card-placeholder';
+          ph.textContent = '📷';
+          fotoArea.appendChild(ph);
+        }
+
+        const overlay       = document.createElement('div');
+        overlay.className   = 'card-foto-overlay';
+        overlay.textContent = temFoto ? '📷 Alterar foto' : '📷 Adicionar foto';
+        if (fotoData?.isNew) {
+          const badge       = document.createElement('span');
+          badge.className   = 'badge-novo';
+          badge.textContent = 'NOVO';
+          overlay.appendChild(badge);
+        }
+        fotoArea.appendChild(overlay);
+
+        fotoArea.addEventListener('click', () => selecionarFoto(nome, 'categoria'));
+        card.appendChild(fotoArea);
+
+        const info     = document.createElement('div');
+        info.className = 'card-info';
+        info.innerHTML = `
+          <div class="card-nome">${nome}</div>
+          <div class="card-cat ${catCSS(nome)}">${label}</div>
+        `;
+        card.appendChild(info);
+        grade.appendChild(card);
+      });
+    }
+
     /* ══════════════════════════════════════════════
        FOTO SELECTION
     ══════════════════════════════════════════════ */
-    function selecionarFoto(nome) {
+    function removerFoto(nome, tipo) {
+      const map = tipo === 'categoria' ? categoriasMap : fotosMap;
+      if (map[nome]?.isNew) {
+        delete map[nome];
+      } else {
+        map[nome] = { isRemoved: true };
+      }
+      if (tipo === 'categoria') {
+        renderizarCategorias();
+      } else {
+        atualizarStats();
+        renderizarGrade();
+      }
+    }
+
+    function selecionarFoto(nome, tipo = 'item') {
       corteAtivoNome = nome;
+      corteAtivoTipo = tipo;
       const fi = document.getElementById('file-input');
       fi.value = '';
       fi.click();
@@ -834,18 +959,18 @@
       const base64     = await fileToBase64(file);
       const ext        = (file.name.split('.').pop() || 'jpg').toLowerCase();
       const previewUrl = URL.createObjectURL(file);
+      const entry      = { foto: previewUrl, alt: `${corteAtivoNome} — Açougue Ouro Verde`, isNew: true, base64, ext };
 
-      fotosMap[corteAtivoNome] = {
-        foto:   previewUrl,
-        alt:    `${corteAtivoNome} — Açougue Ouro Verde`,
-        isNew:  true,
-        base64: base64,
-        ext:    ext,
-      };
-
-      atualizarStats();
-      renderizarGrade();
-      mostrarToast(`Foto de "${corteAtivoNome}" selecionada. Clique em Salvar no Site.`, 'info');
+      if (corteAtivoTipo === 'categoria') {
+        categoriasMap[corteAtivoNome] = entry;
+        renderizarCategorias();
+        mostrarToast(`Foto de categoria "${corteAtivoNome}" selecionada. Clique em Salvar no Site.`, 'info');
+      } else {
+        fotosMap[corteAtivoNome] = entry;
+        atualizarStats();
+        renderizarGrade();
+        mostrarToast(`Foto de "${corteAtivoNome}" selecionada. Clique em Salvar no Site.`, 'info');
+      }
     });
 
     /* ══════════════════════════════════════════════
@@ -875,7 +1000,13 @@
           fotosMap[nome] = { foto: data.foto, alt: data.alt, isNew: false };
         }
 
+        categoriasMap = {};
+        for (const [nome, data] of Object.entries(fotosAtual.categorias || {})) {
+          categoriasMap[nome] = { foto: data.foto, alt: data.alt, isNew: false };
+        }
+
         atualizarStats();
+        renderizarCategorias();
         renderizarGrade();
       } catch (e) {
         document.getElementById('grade-cortes').innerHTML =
@@ -885,8 +1016,9 @@
     }
 
     async function recarregarTudo() {
-      fotosMap    = {};
-      cortesLista = [];
+      fotosMap      = {};
+      categoriasMap = {};
+      cortesLista   = [];
       await init();
     }
 
@@ -898,7 +1030,13 @@
           fotosMap[nome] = { foto: data.foto, alt: data.alt, isNew: false };
         }
       }
+      for (const [nome, data] of Object.entries(fotosAtual.categorias || {})) {
+        if (!categoriasMap[nome] || !categoriasMap[nome].isNew) {
+          categoriasMap[nome] = { foto: data.foto, alt: data.alt, isNew: false };
+        }
+      }
       atualizarStats();
+      renderizarCategorias();
       renderizarGrade();
       mostrarToast('Fotos carregadas!', 'ok');
     }
@@ -906,9 +1044,16 @@
     async function salvarNoSite() {
       if (!tokenConfigurado()) { abrirModalToken(); return; }
 
-      const novasFotos = Object.entries(fotosMap).filter(([, f]) => f.isNew);
-      if (!novasFotos.length) {
-        mostrarToast('Nenhuma foto nova para salvar.', 'info');
+      const novasFotos     = Object.entries(fotosMap).filter(([, f]) => f.isNew);
+      const fotosRemovidas = Object.entries(fotosMap).filter(([, f]) => f.isRemoved);
+      const novasCats      = CATEGORIAS.filter(c => categoriasMap[c.nome]?.isNew);
+      const catsRemovidas  = CATEGORIAS.filter(c => categoriasMap[c.nome]?.isRemoved);
+
+      const totalOps = novasFotos.length + novasCats.length;
+      const temAlteracao = totalOps || fotosRemovidas.length || catsRemovidas.length;
+
+      if (!temAlteracao) {
+        mostrarToast('Nenhuma alteração para salvar.', 'info');
         return;
       }
 
@@ -917,31 +1062,49 @@
 
       try {
         const fotosAtual = await carregarFotosJsonAtual();
+        if (!fotosAtual.categorias) fotosAtual.categorias = {};
 
-        for (let i = 0; i < novasFotos.length; i++) {
-          const [nome, fotoData] = novasFotos[i];
-          atualizarProgresso(Math.round((i / novasFotos.length) * 80));
-          mostrarToast(`Enviando ${i + 1}/${novasFotos.length}: ${nome}…`, 'info');
+        let opsDone = 0;
 
-          const slugNome    = slugify(nome);
-          const ext         = fotoData.ext || 'jpg';
-          const nomeArquivo = `${slugNome}.${ext}`;
-          const rawUrl      = await uploadImagem(nomeArquivo, fotoData.base64);
+        for (const [nome, fotoData] of novasFotos) {
+          atualizarProgresso(Math.round((opsDone / Math.max(totalOps, 1)) * 80));
+          mostrarToast(`Enviando ${opsDone + 1}/${totalOps}: ${nome}…`, 'info');
+          const rawUrl = await uploadImagem(`${slugify(nome)}.${fotoData.ext || 'jpg'}`, fotoData.base64);
+          fotosAtual.itens[nome] = { foto: rawUrl, alt: `${nome} — Açougue Ouro Verde` };
+          opsDone++;
+        }
 
-          fotosAtual.itens[nome] = {
-            foto: rawUrl,
-            alt:  `${nome} — Açougue Ouro Verde`,
-          };
+        for (const [nome] of fotosRemovidas) {
+          delete fotosAtual.itens[nome];
+        }
+
+        for (const { nome, slug } of novasCats) {
+          const fotoData = categoriasMap[nome];
+          atualizarProgresso(Math.round((opsDone / Math.max(totalOps, 1)) * 80));
+          mostrarToast(`Enviando categoria ${nome}…`, 'info');
+          const rawUrl = await uploadImagem(`${slug}.${fotoData.ext || 'jpg'}`, fotoData.base64);
+          fotosAtual.categorias[nome] = { foto: rawUrl, alt: `${nome} — Açougue Ouro Verde` };
+          opsDone++;
+        }
+
+        for (const { nome } of catsRemovidas) {
+          delete fotosAtual.categorias[nome];
         }
 
         atualizarProgresso(90);
         fotosAtual.versao = new Date().toISOString();
         await salvarFotosJson(fotosAtual);
 
-        novasFotos.forEach(([nome]) => { fotosMap[nome].isNew = false; });
+        novasFotos.forEach(([nome])     => { fotosMap[nome].isNew = false; });
+        fotosRemovidas.forEach(([nome]) => { delete fotosMap[nome]; });
+        novasCats.forEach(({ nome })    => { categoriasMap[nome].isNew = false; });
+        catsRemovidas.forEach(({ nome }) => { delete categoriasMap[nome]; });
 
         atualizarProgresso(100);
-        mostrarToast(`✓ ${novasFotos.length} foto(s) salva(s)! Site atualiza em 1-2 minutos.`, 'ok');
+        const n = novasFotos.length + novasCats.length + fotosRemovidas.length + catsRemovidas.length;
+        mostrarToast(`✓ ${n} alteração(ões) salva(s)! Site atualiza em 1-2 minutos.`, 'ok');
+        atualizarStats();
+        renderizarCategorias();
         renderizarGrade();
 
       } catch (e) {

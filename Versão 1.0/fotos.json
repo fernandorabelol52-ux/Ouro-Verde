@@ -1,13 +1,13 @@
 {
-  "versao": "2026-05-29T15:58:37.464Z",
+  "versao": "2026-05-30T14:57:30.052Z",
   "fallback": "logo.png",
   "itens": {
     "Sobrecoxa": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/sobrecoxa.png",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/sobrecoxa.png",
       "alt": "Sobrecoxa — Açougue Ouro Verde"
     },
     "Filé Mignon": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/file-mignon.png",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/file-mignon.png",
       "alt": "Filé Mignon — Açougue Ouro Verde"
     },
     "Picanha": {

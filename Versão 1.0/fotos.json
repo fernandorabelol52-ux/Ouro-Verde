@@ -1,5 +1,26 @@
 {
-  "versao": "2024-01-01T00:00:00",
+  "versao": "2026-05-29T15:58:37.464Z",
   "fallback": "logo.png",
-  "itens": {}
+  "itens": {
+    "Sobrecoxa": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/sobrecoxa.png",
+      "alt": "Sobrecoxa — Açougue Ouro Verde"
+    },
+    "Filé Mignon": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/file-mignon.png",
+      "alt": "Filé Mignon — Açougue Ouro Verde"
+    },
+    "Picanha": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/picanha.jpeg",
+      "alt": "Picanha — Açougue Ouro Verde"
+    },
+    "Alcatra": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/alcatra.jpeg",
+      "alt": "Alcatra — Açougue Ouro Verde"
+    },
+    "Maminha": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/maminha.jpeg",
+      "alt": "Maminha — Açougue Ouro Verde"
+    }
+  }
 }

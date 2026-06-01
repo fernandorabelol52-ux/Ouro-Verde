@@ -749,10 +749,11 @@
        GITHUB API
     ══════════════════════════════════════════════ */
     async function getFileSHA(path) {
-      const resp = await fetch(
-        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`,
-        { headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' } }
-      );
+      const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`;
+      console.log('[GitHub] getFileSHA →', url);
+      const resp = await fetch(url, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
       if (resp.status === 404) return null;
       const data = await resp.json();
       return data.sha || null;
@@ -762,18 +763,16 @@
       const sha  = await getFileSHA(path);
       const body = { message: mensagem, content: base64Content, branch: GITHUB_CONFIG.branch };
       if (sha) body.sha = sha;
-      const resp = await fetch(
-        `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`,
-        {
-          method:  'PUT',
-          headers: {
-            Authorization:  `token ${getToken()}`,
-            'Content-Type': 'application/json',
-            Accept:         'application/vnd.github.v3+json',
-          },
-          body: JSON.stringify(body),
-        }
-      );
+      const url  = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`;
+      const resp = await fetch(url, {
+        method:  'PUT',
+        headers: {
+          Authorization:  `token ${getToken()}`,
+          'Content-Type': 'application/json',
+          Accept:         'application/vnd.github.v3+json',
+        },
+        body: JSON.stringify(body),
+      });
       if (!resp.ok) {
         const err = await resp.json();
         throw new Error(err.message || `HTTP ${resp.status}`);
@@ -788,9 +787,11 @@
     }
 
     async function uploadImagem(nomeArquivo, base64Puro) {
-      const path = GITHUB_CONFIG.imagensPath + nomeArquivo;
+      const path    = GITHUB_CONFIG.imagensPath + nomeArquivo;
+      const rawUrl  = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${encodePath(path)}`;
+      console.log('[GitHub] uploadImagem path →', path, '| rawUrl →', rawUrl);
       await uploadArquivo(path, base64Puro, `foto: ${nomeArquivo}`);
-      return `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${encodePath(path)}`;
+      return rawUrl;
     }
 
     async function carregarFotosJsonAtual() {

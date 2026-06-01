@@ -1,5 +1,5 @@
 {
-  "versao": "2026-06-01T20:57:07.898Z",
+  "versao": "2026-06-01T20:57:56.123Z",
   "fallback": "logo.png",
   "itens": {
     "Sobrecoxa": {
@@ -41,7 +41,7 @@
       "alt": "Bovinos — Açougue Ouro Verde"
     },
     "Suinos": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/cat-suinos.jpg",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/cat-suinos.jpeg",
       "alt": "Suinos — Açougue Ouro Verde",
       "position": "50% 50%"
     },

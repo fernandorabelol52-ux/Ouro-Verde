@@ -62,46 +62,62 @@
       </div>
     </div>
 
-    <!-- SLIDE 1: SUÍNOS & AVES — duas colunas com fotos -->
+    <!-- SLIDE 1: SUÍNOS — lista com coluna de fotos -->
     <div class="slide" id="slide-1">
-      <div class="s2-layout">
+      <div class="s1-layout">
 
-        <!-- Metade Suínos -->
-        <div class="s2-half">
+        <!-- Coluna de fotos (160px) -->
+        <div class="s1-fotos" id="col-fotos-suinos">
+          <!-- imagem de categoria ou fotos dos cortes -->
+        </div>
+
+        <!-- Tabela de preços -->
+        <div class="s1-tabela">
           <div class="cat-hdr">
             <span class="cat-tit">SUÍNOS</span>
             <span class="cat-sub">PREÇO POR KG</span>
           </div>
-          <div class="s2-content">
-            <div class="s2-fotos" id="col-fotos-suinos">
-              <!-- 2 imagens injetadas por criarImgComFallback() -->
-            </div>
-            <div id="sp-grid-suinos" class="sp-grid-v3"></div>
+          <div class="col-hdr">
+            <span>Descrição</span>
+            <span>R$/kg</span>
           </div>
-        </div>
-
-        <!-- Separador dourado -->
-        <div class="s2-divider"></div>
-
-        <!-- Metade Aves -->
-        <div class="s2-half">
-          <div class="cat-hdr verde">
-            <span class="cat-tit">AVES</span>
-            <span class="cat-sub">PREÇO POR KG</span>
-          </div>
-          <div class="s2-content">
-            <div class="s2-fotos" id="col-fotos-aves">
-              <!-- 2 imagens injetadas por criarImgComFallback() -->
-            </div>
-            <div id="sp-grid-aves" class="sp-grid-v3"></div>
-          </div>
+          <ul class="lista-itens" id="lista-suinos">
+            <li class="item-loading">Carregando…</li>
+          </ul>
         </div>
 
       </div>
     </div>
 
-    <!-- SLIDE 2: OFERTA ESPECIAL DO DIA — carrossel interno -->
+    <!-- SLIDE 2: AVES — lista com coluna de fotos -->
     <div class="slide" id="slide-2">
+      <div class="s1-layout">
+
+        <!-- Coluna de fotos (160px) -->
+        <div class="s1-fotos" id="col-fotos-aves">
+          <!-- imagem de categoria ou fotos dos cortes -->
+        </div>
+
+        <!-- Tabela de preços -->
+        <div class="s1-tabela">
+          <div class="cat-hdr verde">
+            <span class="cat-tit">AVES</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="col-hdr">
+            <span>Descrição</span>
+            <span>R$/kg</span>
+          </div>
+          <ul class="lista-itens" id="lista-aves">
+            <li class="item-loading">Carregando…</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SLIDE 3: OFERTA ESPECIAL DO DIA — carrossel interno -->
+    <div class="slide" id="slide-3">
       <div class="s3-layout">
 
         <!-- Coluna esquerda: foto -->
@@ -139,12 +155,9 @@
     <p class="footer-update" id="ultima-atualizacao">—</p>
   </footer>
 
-  <!-- Elementos ocultos que app.js precisa para renderizar -->
+  <!-- Elemento oculto que o carrossel de ofertas precisa -->
   <div class="hidden-targets" aria-hidden="true">
-    <ul id="lista-suinos"></ul>
     <ul id="lista-ofertas"></ul>
-    <div id="sp-grid-bovinos"></div>
-    <div id="slide4-grid"></div>
   </div>
 
   <script src="app.js"></script>
@@ -166,79 +179,39 @@
        V3 — OVERRIDES E LÓGICA DE FOTOS / CARROSSEL
        ============================================================ */
 
-    // Override: rotação usa apenas os 3 slides v3
-    // getSlideList é function declaration → pode ser sobrescrita
+    // Override: rotação usa os 4 slides (3 sem promoções)
     getSlideList = function () {
-      return temPromocoes ? [0, 1, 2] : [0, 1];
+      return temPromocoes ? [0, 1, 2, 3] : [0, 1, 2];
     };
-    renderDots(); // atualiza dots com a nova lista
+    renderDots();
 
-    /* ── INJEÇÃO DE IMAGENS — SLIDE 0 (Bovinos) ─────────────── */
+    /* ── INJEÇÃO DE IMAGENS ──────────────────────────────────── */
 
-    function injetarImagensBovinos() {
-      const col = document.getElementById('col-fotos-bovinos');
+    function injetarImagensColuna(listaId, colId, catNome) {
+      const col = document.getElementById(colId);
       if (!col || typeof criarImgComFallback !== 'function') return;
 
-      // Categoria tem prioridade: uma única imagem que cobre a coluna inteira
-      const catFoto = CATEGORIAS_MAP['Bovinos']?.foto;
-      if (catFoto) {
+      // Foto de categoria tem prioridade: preenche a coluna inteira
+      const catData = CATEGORIAS_MAP[catNome];
+      if (catData?.foto) {
         col.innerHTML = '';
         const img = document.createElement('img');
-        img.src   = catFoto;
-        img.alt   = 'Bovinos — Açougue Ouro Verde';
+        img.src   = catData.foto;
+        img.alt   = `${catNome} — Açougue Ouro Verde`;
         img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;flex:1;';
+        img.style.objectPosition = catData.position || '50% 50%';
         col.appendChild(img);
         return;
       }
 
       // Fallback: fotos individuais dos cortes
-      const itens = Array.from(document.querySelectorAll('#lista-bovinos .item-row'));
+      const itens = Array.from(document.querySelectorAll(`#${listaId} .item-row`));
       if (!itens.length) return;
-
       const promos = itens.filter(el => el.classList.contains('em-promo'));
       const fonte  = promos.length >= 3 ? promos : itens;
       const nomes  = fonte.slice(0, 3)
         .map(el => el.querySelector('.item-nome')?.textContent?.trim() || '')
         .filter(Boolean);
-
-      col.innerHTML = '';
-      nomes.forEach(nome => {
-        const wrap = document.createElement('div');
-        wrap.className = 'foto-cell';
-        wrap.appendChild(criarImgComFallback(nome, 'foto-corte'));
-        col.appendChild(wrap);
-      });
-    }
-
-    /* ── INJEÇÃO DE IMAGENS — SLIDE 1 (Suínos / Aves) ───────── */
-
-    function injetarImagensGrid(gridId, colId) {
-      const col  = document.getElementById(colId);
-      const grid = document.getElementById(gridId);
-      if (!col || !grid || typeof criarImgComFallback !== 'function') return;
-
-      // Categoria tem prioridade: uma única imagem que cobre a coluna inteira
-      const catNomePorCol = { 'col-fotos-suinos': 'Suinos', 'col-fotos-aves': 'Aves' };
-      const catNome = catNomePorCol[colId];
-      const catFoto = catNome && CATEGORIAS_MAP[catNome]?.foto;
-      if (catFoto) {
-        col.innerHTML = '';
-        const img = document.createElement('img');
-        img.src   = catFoto;
-        img.alt   = `${catNome} — Açougue Ouro Verde`;
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;flex:1;';
-        col.appendChild(img);
-        return;
-      }
-
-      // Fallback: fotos individuais dos cortes
-      const cards = Array.from(grid.querySelectorAll('.sp-card'));
-      if (!cards.length) return;
-
-      const nomes = cards.slice(0, 2)
-        .map(el => el.querySelector('.sp-card-nome')?.textContent?.trim() || '')
-        .filter(Boolean);
-
       col.innerHTML = '';
       nomes.forEach(nome => {
         const wrap = document.createElement('div');
@@ -250,19 +223,19 @@
 
     /* ── OBSERVERS ───────────────────────────────────────────── */
 
-    const obsBovinos = new MutationObserver(() => injetarImagensBovinos());
+    const obsBovinos = new MutationObserver(() => injetarImagensColuna('lista-bovinos', 'col-fotos-bovinos', 'Bovinos'));
     obsBovinos.observe(document.getElementById('lista-bovinos'), { childList: true });
 
-    const obsSuinos = new MutationObserver(() => injetarImagensGrid('sp-grid-suinos', 'col-fotos-suinos'));
-    obsSuinos.observe(document.getElementById('sp-grid-suinos'), { childList: true });
+    const obsSuinos = new MutationObserver(() => injetarImagensColuna('lista-suinos', 'col-fotos-suinos', 'Suinos'));
+    obsSuinos.observe(document.getElementById('lista-suinos'), { childList: true });
 
-    const obsAves = new MutationObserver(() => injetarImagensGrid('sp-grid-aves', 'col-fotos-aves'));
-    obsAves.observe(document.getElementById('sp-grid-aves'), { childList: true });
+    const obsAves = new MutationObserver(() => injetarImagensColuna('lista-aves', 'col-fotos-aves', 'Aves'));
+    obsAves.observe(document.getElementById('lista-aves'), { childList: true });
 
     // Guarda contra condição de corrida (dados já carregados antes do observer)
-    injetarImagensBovinos();
-    injetarImagensGrid('sp-grid-suinos', 'col-fotos-suinos');
-    injetarImagensGrid('sp-grid-aves', 'col-fotos-aves');
+    injetarImagensColuna('lista-bovinos', 'col-fotos-bovinos', 'Bovinos');
+    injetarImagensColuna('lista-suinos',  'col-fotos-suinos',  'Suinos');
+    injetarImagensColuna('lista-aves',    'col-fotos-aves',    'Aves');
 
     /* ── CARROSSEL — SLIDE 2 (Oferta Especial) ───────────────── */
 

@@ -472,21 +472,10 @@ function renderizarSlide4(promocoes) {
    ============================================================ */
 function renderSlide(idx, dados) {
   switch (idx) {
-    case 0:
-      renderizarColuna('lista-bovinos', dados.bovinos);
-      renderizarColuna('lista-suinos',  dados.suinosAves);
-      renderizarOfertas(dados.promocoes);
-      break;
-    case 1:
-      renderizarSpotlightBovinos(dados.bovinos);
-      break;
-    case 2:
-      renderizarSpotlightHalf('sp-grid-suinos', dados.suinos);
-      renderizarSpotlightHalf('sp-grid-aves',   dados.aves);
-      break;
-    case 3:
-      renderizarSlide4(dados.promocoes);
-      break;
+    case 0: renderizarColuna('lista-bovinos', dados.bovinos);   break;
+    case 1: renderizarColuna('lista-suinos',  dados.suinos);    break;
+    case 2: renderizarColuna('lista-aves',    dados.aves);      break;
+    case 3: renderizarOfertas(dados.promocoes);                 break;
   }
 }
 
@@ -496,7 +485,7 @@ function renderSlide(idx, dados) {
 
 /** Retorna a lista ordenada de índices de slides a rotacionar */
 function getSlideList() {
-  return temPromocoes ? [0, 1, 2] : [0, 1];
+  return temPromocoes ? [0, 1, 2, 3] : [0, 1, 2];
 }
 
 /** Atualiza a aparência dos dots no rodapé */

@@ -459,6 +459,53 @@
     .toast.ok      { background: #27AE60; color: #fff; }
     .toast.erro    { background: var(--vm);  color: #fff; }
     .toast.info    { background: #3B82F6;   color: #fff; }
+
+    /* ─── POSITION CONTROL ───────────────────── */
+    .pos-control {
+      padding: 10px 14px 14px;
+      border-top: 1px solid var(--brd);
+    }
+
+    .pos-control-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--txt2);
+      margin-bottom: 8px;
+    }
+
+    .pos-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .pos-slider-row .pos-axis {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      color: var(--txt2);
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .pos-slider-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--vm);
+      cursor: pointer;
+    }
+
+    .pos-slider-row .pos-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      color: var(--txt2);
+      width: 30px;
+      text-align: right;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -575,8 +622,8 @@
 
     const CATEGORIAS = [
       { nome: 'Bovinos', slug: 'cat-bovinos', label: 'Slide 1 — Col. esquerda' },
-      { nome: 'Suinos',  slug: 'cat-suinos',  label: 'Slide 2 — Lado esquerdo' },
-      { nome: 'Aves',    slug: 'cat-aves',    label: 'Slide 2 — Lado direito'  },
+      { nome: 'Suinos',  slug: 'cat-suinos',  label: 'Slide 2 — Col. esquerda' },
+      { nome: 'Aves',    slug: 'cat-aves',    label: 'Slide 3 — Col. esquerda' },
     ];
 
     /* ══════════════════════════════════════════════
@@ -886,6 +933,7 @@
           img.className = 'card-foto';
           img.alt       = nome;
           img.onerror   = () => { img.style.display = 'none'; };
+          img.style.objectPosition = fotoData.position || '50% 50%';
           fotoArea.appendChild(img);
 
           const btnRem       = document.createElement('button');
@@ -922,6 +970,51 @@
           <div class="card-cat ${catCSS(nome)}">${label}</div>
         `;
         card.appendChild(info);
+
+        if (temFoto) {
+          const pos = (fotoData.position || '50% 50%').split(' ');
+          const px  = parseInt(pos[0]) || 50;
+          const py  = parseInt(pos[1]) || 50;
+
+          const posControl = document.createElement('div');
+          posControl.className = 'pos-control';
+          posControl.innerHTML = `
+            <div class="pos-control-label">Posição da Imagem</div>
+            <div class="pos-slider-row">
+              <span class="pos-axis">←→</span>
+              <input type="range" min="0" max="100" value="${px}" data-axis="x" data-cat="${nome}" />
+              <span class="pos-val">${px}%</span>
+            </div>
+            <div class="pos-slider-row">
+              <span class="pos-axis">↑↓</span>
+              <input type="range" min="0" max="100" value="${py}" data-axis="y" data-cat="${nome}" />
+              <span class="pos-val">${py}%</span>
+            </div>
+          `;
+
+          posControl.querySelectorAll('input[type="range"]').forEach(slider => {
+            slider.addEventListener('input', function () {
+              const catNome = this.dataset.cat;
+              const axis    = this.dataset.axis;
+              this.nextElementSibling.textContent = this.value + '%';
+
+              const curr = (categoriasMap[catNome]?.position || '50% 50%').split(' ');
+              const newX = axis === 'x' ? this.value : parseInt(curr[0]);
+              const newY = axis === 'y' ? this.value : parseInt(curr[1]);
+              const newPos = `${newX}% ${newY}%`;
+
+              const imgEl = card.querySelector('.card-foto');
+              if (imgEl) imgEl.style.objectPosition = newPos;
+
+              if (!categoriasMap[catNome]) categoriasMap[catNome] = {};
+              categoriasMap[catNome].position      = newPos;
+              categoriasMap[catNome].positionDirty = true;
+            });
+          });
+
+          card.appendChild(posControl);
+        }
+
         grade.appendChild(card);
       });
     }
@@ -1002,7 +1095,7 @@
 
         categoriasMap = {};
         for (const [nome, data] of Object.entries(fotosAtual.categorias || {})) {
-          categoriasMap[nome] = { foto: data.foto, alt: data.alt, isNew: false };
+          categoriasMap[nome] = { foto: data.foto, alt: data.alt, position: data.position || '50% 50%', isNew: false };
         }
 
         atualizarStats();
@@ -1032,7 +1125,7 @@
       }
       for (const [nome, data] of Object.entries(fotosAtual.categorias || {})) {
         if (!categoriasMap[nome] || !categoriasMap[nome].isNew) {
-          categoriasMap[nome] = { foto: data.foto, alt: data.alt, isNew: false };
+          categoriasMap[nome] = { foto: data.foto, alt: data.alt, position: data.position || '50% 50%', isNew: false };
         }
       }
       atualizarStats();
@@ -1048,9 +1141,10 @@
       const fotosRemovidas = Object.entries(fotosMap).filter(([, f]) => f.isRemoved);
       const novasCats      = CATEGORIAS.filter(c => categoriasMap[c.nome]?.isNew);
       const catsRemovidas  = CATEGORIAS.filter(c => categoriasMap[c.nome]?.isRemoved);
+      const positionsDirty = CATEGORIAS.filter(c => categoriasMap[c.nome]?.positionDirty && !categoriasMap[c.nome]?.isNew);
 
       const totalOps = novasFotos.length + novasCats.length;
-      const temAlteracao = totalOps || fotosRemovidas.length || catsRemovidas.length;
+      const temAlteracao = totalOps || fotosRemovidas.length || catsRemovidas.length || positionsDirty.length;
 
       if (!temAlteracao) {
         mostrarToast('Nenhuma alteração para salvar.', 'info');
@@ -1083,7 +1177,7 @@
           atualizarProgresso(Math.round((opsDone / Math.max(totalOps, 1)) * 80));
           mostrarToast(`Enviando categoria ${nome}…`, 'info');
           const rawUrl = await uploadImagem(`${slug}.${fotoData.ext || 'jpg'}`, fotoData.base64);
-          fotosAtual.categorias[nome] = { foto: rawUrl, alt: `${nome} — Açougue Ouro Verde` };
+          fotosAtual.categorias[nome] = { foto: rawUrl, alt: `${nome} — Açougue Ouro Verde`, position: fotoData.position || '50% 50%' };
           opsDone++;
         }
 
@@ -1091,17 +1185,24 @@
           delete fotosAtual.categorias[nome];
         }
 
+        for (const { nome } of positionsDirty) {
+          if (fotosAtual.categorias[nome]) {
+            fotosAtual.categorias[nome].position = categoriasMap[nome].position || '50% 50%';
+          }
+        }
+
         atualizarProgresso(90);
         fotosAtual.versao = new Date().toISOString();
         await salvarFotosJson(fotosAtual);
 
-        novasFotos.forEach(([nome])     => { fotosMap[nome].isNew = false; });
-        fotosRemovidas.forEach(([nome]) => { delete fotosMap[nome]; });
-        novasCats.forEach(({ nome })    => { categoriasMap[nome].isNew = false; });
+        novasFotos.forEach(([nome])      => { fotosMap[nome].isNew = false; });
+        fotosRemovidas.forEach(([nome])  => { delete fotosMap[nome]; });
+        novasCats.forEach(({ nome })     => { categoriasMap[nome].isNew = false; });
         catsRemovidas.forEach(({ nome }) => { delete categoriasMap[nome]; });
+        positionsDirty.forEach(({ nome }) => { categoriasMap[nome].positionDirty = false; });
 
         atualizarProgresso(100);
-        const n = novasFotos.length + novasCats.length + fotosRemovidas.length + catsRemovidas.length;
+        const n = novasFotos.length + novasCats.length + fotosRemovidas.length + catsRemovidas.length + positionsDirty.length;
         mostrarToast(`✓ ${n} alteração(ões) salva(s)! Site atualiza em 1-2 minutos.`, 'ok');
         atualizarStats();
         renderizarCategorias();

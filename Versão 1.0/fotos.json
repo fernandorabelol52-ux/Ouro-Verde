@@ -1,5 +1,5 @@
 {
-  "versao": "2026-06-01T20:57:56.123Z",
+  "versao": "2026-06-01T21:03:42.493Z",
   "fallback": "logo.png",
   "itens": {
     "Sobrecoxa": {
@@ -41,14 +41,14 @@
       "alt": "Bovinos — Açougue Ouro Verde"
     },
     "Suinos": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/cat-suinos.jpeg",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/cat-suinos.jpg",
       "alt": "Suinos — Açougue Ouro Verde",
-      "position": "50% 50%"
+      "position": "60% 26%"
     },
     "Aves": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/cat-aves.jpg",
       "alt": "Aves — Açougue Ouro Verde",
-      "position": "50% 50%"
+      "position": "50% 21%"
     }
   }
 }

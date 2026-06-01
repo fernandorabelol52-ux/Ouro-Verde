@@ -1,5 +1,5 @@
 {
-  "versao": "2026-06-01T21:03:42.493Z",
+  "versao": "2026-06-01T21:04:19.649Z",
   "fallback": "logo.png",
   "itens": {
     "Sobrecoxa": {
@@ -48,7 +48,7 @@
     "Aves": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/cat-aves.jpg",
       "alt": "Aves — Açougue Ouro Verde",
-      "position": "50% 21%"
+      "position": "30% 21%"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "versao": "2026-06-01T21:05:01.320Z",
+  "versao": "2026-06-22T00:00:00.000Z",
   "fallback": "logo.png",
   "itens": {
     "Sobrecoxa": {
@@ -11,15 +11,15 @@
       "alt": "Filé Mignon — Açougue Ouro Verde"
     },
     "Picanha": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/picanha.jpeg",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/picanha.jpeg",
       "alt": "Picanha — Açougue Ouro Verde"
     },
     "Alcatra": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/alcatra.jpeg",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/alcatra.jpeg",
       "alt": "Alcatra — Açougue Ouro Verde"
     },
     "Maminha": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/maminha.jpeg",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/maminha.jpeg",
       "alt": "Maminha — Açougue Ouro Verde"
     },
     "Peito de Frango": {

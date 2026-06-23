@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Açougue Ouro Verde</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --vm:   #C0392B;
+      --vm2:  #8B1A1A;
+      --vd:   #2D7A1F;
+      --vd2:  #1a5010;
+      --ou:   #C9A84C;
+      --bg:   #FFFFFF;
+      --bg2:  #fafaf8;
+      --brd:  #f0edea;
+      --brd2: #e0ddd8;
+      --txt:  #1A1A17;
+      --txt2: #8A8785;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #F7F5F2;
+      font-family: 'Barlow', sans-serif;
+      color: var(--txt);
+    }
+
+    /* ─── HEADER ─────────────────────────────── */
+    .header {
+      background: #FFFFFF;
+      border-bottom: 2px solid var(--brd2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--vm), var(--ou), var(--vd), var(--ou), var(--vm));
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 32px;
+    }
+
+    .header-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-logo-img {
+      height: 52px;
+      object-fit: contain;
+    }
+
+    .store-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 3px;
+      color: var(--vm);
+      line-height: 1;
+      display: block;
+    }
+
+    .store-tagline {
+      font-size: 10px;
+      color: var(--vd);
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .token-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--vm);
+    }
+
+    /* ─── BUTTONS ─────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border: 1.5px solid var(--brd2);
+      background: var(--bg);
+      color: var(--txt);
+      transition: all 0.15s;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-primario { background: var(--vm); color: #fff; border-color: transparent; }
+    .btn-primario:hover:not(:disabled) { background: var(--vm2); transform: translateY(-1px); }
+
+    .btn-verde { background: var(--vd); color: #fff; border-color: transparent; }
+    .btn-verde:hover:not(:disabled) { background: var(--vd2); transform: translateY(-1px); }
+
+    .btn-secundario { background: var(--bg); color: var(--txt); border-color: var(--brd2); }
+    .btn-secundario:hover:not(:disabled) { background: var(--brd); }
+
+    .btn:hover:not(:disabled):not(.btn-primario):not(.btn-verde) { background: var(--brd); }
+
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+    /* ─── LAYOUT ─────────────────────────────── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: var(--txt);
+      margin-bottom: 16px;
+    }
+
+    /* ─── EXPORT PANEL ───────────────────────── */
+    .export-panel {
+      background: var(--bg);
+      border: 1.5px solid var(--brd2);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .export-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: var(--bg2);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-numero {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      line-height: 1;
+      margin-bottom: 4px;
+      color: var(--txt);
+    }
+
+    .stat-numero.verde { color: #27AE60; }
+    .stat-numero.cinza { color: var(--txt2); }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--txt2);
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .export-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ─── PROGRESS BAR ───────────────────────── */
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--brd2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--vm), var(--ou));
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    /* ─── CARD GRID ──────────────────────────── */
+    .grade {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: var(--bg);
+      border: 1.5px solid var(--brd2);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 6px 24px rgba(0,0,0,0.09);
+      transform: translateY(-2px);
+    }
+
+    .card.tem-foto  { border-color: #27AE60; }
+    .card.nova-foto { border-color: var(--ou); }
+    .card.em-promo  { border-color: var(--ou); }
+    .card.em-promo.tem-foto { border-color: var(--vm); }
+
+    .card-foto-area {
+      height: 140px;
+      background: var(--bg2);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .card-foto {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-foto-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(192,57,43,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card-foto-area:hover .card-foto-overlay { opacity: 1; }
+
+    .card.sem-foto .card-foto-overlay {
+      opacity: 0.65;
+      background: rgba(0,0,0,0.22);
+      font-size: 13px;
+    }
+
+    .card.sem-foto .card-foto-area:hover .card-foto-overlay {
+      opacity: 1;
+      background: rgba(192,57,43,0.85);
+      font-size: 15px;
+    }
+
+    .card-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      font-size: 44px;
+      color: var(--brd2);
+    }
+
+    .badge-novo {
+      font-size: 10px;
+      background: var(--ou);
+      color: #1A1A17;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      font-weight: 900;
+    }
+
+    .card-info {
+      padding: 12px 14px;
+    }
+
+    .card-nome {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 1px;
+      color: var(--txt);
+      line-height: 1.1;
+    }
+
+    .card-cat {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .card-cat.bovinos { color: var(--vd); }
+    .card-cat.suinos  { color: #C4701A; }
+    .card-cat.aves    { color: #2A7FAE; }
+
+    /* ─── REMOVE BUTTON ─────────────────────── */
+    .btn-remover {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(192,57,43,0.92);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      line-height: 1;
+      transition: background 0.15s, transform 0.15s;
+      padding: 0;
+    }
+
+    .btn-remover:hover {
+      background: var(--vm2);
+      transform: scale(1.15);
+    }
+
+    /* ─── LOADING STATE ──────────────────────── */
+    .loading-msg {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--txt2);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      letter-spacing: 1px;
+      grid-column: 1 / -1;
+    }
+
+    /* ─── TOKEN MODAL ────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .modal {
+      background: var(--bg);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+      border-top: 4px solid var(--vm);
+    }
+
+    .modal-titulo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--vm);
+      margin-bottom: 8px;
+    }
+
+    .modal-text {
+      font-size: 13px;
+      color: var(--txt2);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .modal-text strong { color: var(--txt); }
+
+    .input-field {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--brd2);
+      border-radius: 8px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      color: var(--txt);
+      background: var(--bg2);
+      margin-bottom: 16px;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--vm);
+      background: #fff;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* ─── TOAST ──────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 999;
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 1px;
+      max-width: 380px;
+    }
+
+    .toast.visivel { transform: translateY(0); opacity: 1; }
+    .toast.ok      { background: #27AE60; color: #fff; }
+    .toast.erro    { background: var(--vm);  color: #fff; }
+    .toast.info    { background: #3B82F6;   color: #fff; }
+
+    /* ─── POSITION CONTROL ───────────────────── */
+    .pos-control {
+      padding: 10px 14px 14px;
+      border-top: 1px solid var(--brd);
+    }
+
+    .pos-control-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--txt2);
+      margin-bottom: 8px;
+    }
+
+    .pos-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .pos-slider-row .pos-axis {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      color: var(--txt2);
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .pos-slider-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--vm);
+      cursor: pointer;
+    }
+
+    .pos-slider-row .pos-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      color: var(--txt2);
+      width: 30px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-logo-group">
+        <img src="logo.png" alt="Açougue Ouro Verde" class="header-logo-img" />
+        <div class="header-title">
+          <span class="store-name">AÇOUGUE OURO VERDE</span>
+          <span class="store-tagline">Painel de Administração · Fotos</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="token-badge" id="token-badge">🔑 Token não configurado</div>
+        <button class="btn btn-sm" id="btn-token" onclick="abrirModalToken()">Configurar token</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div class="export-panel">
+      <div class="export-stats">
+        <div class="stat">
+          <div class="stat-numero" id="stat-total">—</div>
+          <div class="stat-label">Cortes</div>
+        </div>
+        <div class="stat">
+          <div class="stat-numero verde" id="stat-com-foto">—</div>
+          <div class="stat-label">Com Foto</div>
+        </div>
+        <div class="stat">
+          <div class="stat-numero cinza" id="stat-sem-foto">—</div>
+          <div class="stat-label">Sem Foto</div>
+        </div>
+      </div>
+      <div class="export-actions">
+        <button class="btn btn-primario" id="btn-salvar" onclick="salvarNoSite()">💾 Salvar no Site</button>
+        <button class="btn btn-secundario" onclick="recarregarTudo()">🔄 Recarregar</button>
+      </div>
+      <div class="progress-bar" id="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Fotos de Categoria</div>
+    <div class="grade" id="grade-categorias"></div>
+
+    <div class="section-title">Gerenciar Fotos</div>
+    <div class="grade" id="grade-cortes">
+      <div class="loading-msg">Carregando cardápio…</div>
+    </div>
+
+  </main>
+
+  <!-- Token Modal -->
+  <div class="modal-overlay" id="modal-token" style="display:none" onclick="fecharModalToken()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-titulo">🔑 Token GitHub</div>
+      <p class="modal-text">
+        Crie um <strong>Personal Access Token</strong> no GitHub com permissão
+        <strong>repo</strong> (repositório privado) e cole abaixo.<br />
+        O token é salvo apenas neste navegador — nunca sai do seu dispositivo.
+      </p>
+      <input
+        type="password"
+        id="input-token"
+        class="input-field"
+        placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+        onkeydown="if(event.key==='Enter') confirmarToken()"
+      />
+      <div class="modal-actions">
+        <button class="btn btn-secundario" onclick="fecharModalToken()">Cancelar</button>
+        <button class="btn btn-primario" onclick="confirmarToken()">Salvar Token</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Hidden file input -->
+  <input type="file" id="file-input" accept="image/*" style="display:none" />
+
+  <script>
+    /* ══════════════════════════════════════════════
+       CONFIG
+    ══════════════════════════════════════════════ */
+    const GITHUB_CONFIG = {
+      owner:         'fernandorabelol52-ux',
+      repo:          'Ouro-Verde',
+      branch:        'main',
+      fotosJsonPath: 'Versão 1.0/fotos.json',
+      imagensPath:   'Versão 1.0/imagens/',
+    };
+
+    // Encode each path segment separately so '/' stays literal
+    function encodePath(p) {
+      return p.split('/').map(s => encodeURIComponent(s)).join('/');
+    }
+
+    const SHEET_CSV_URL =
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEq8oeTNFgdAnWZIGOrmoU8QO7WqlMAyvXLPS5rToesYvZdNaoJAgj3pyVcNpPHo8Sk4ty_IukrWt9/pub?gid=232780593&single=true&output=csv';
+
+    /* ══════════════════════════════════════════════
+       STATE
+    ══════════════════════════════════════════════ */
+    let cortesLista    = [];
+    let fotosMap       = {};
+    let categoriasMap  = {};
+    let corteAtivoNome = null;
+    let corteAtivoTipo = 'item'; // 'item' | 'categoria'
+
+    const CATEGORIAS = [
+      { nome: 'Bovinos', slug: 'cat-bovinos', label: 'Slide 1 — Col. esquerda' },
+      { nome: 'Suinos',  slug: 'cat-suinos',  label: 'Slide 2 — Col. esquerda' },
+      { nome: 'Aves',    slug: 'cat-aves',    label: 'Slide 3 — Col. esquerda' },
+    ];
+
+    /* ══════════════════════════════════════════════
+       TOKEN
+    ══════════════════════════════════════════════ */
+    function getToken()        { return localStorage.getItem('gh_token_acougue') || ''; }
+    function salvarToken(t)    { localStorage.setItem('gh_token_acougue', t); }
+    function removerToken()    { localStorage.removeItem('gh_token_acougue'); }
+    function tokenConfigurado() { return !!getToken(); }
+
+    /* ══════════════════════════════════════════════
+       UI HELPERS
+    ══════════════════════════════════════════════ */
+    function atualizarTokenBadge() {
+      const badge = document.getElementById('token-badge');
+      if (tokenConfigurado()) {
+        badge.textContent = '🔑 Token configurado';
+        badge.style.color = '#27AE60';
+      } else {
+        badge.textContent = '🔑 Token não configurado';
+        badge.style.color = 'var(--vm)';
+      }
+    }
+
+    let _toastTimer;
+    function mostrarToast(msg, tipo = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className   = `toast ${tipo} visivel`;
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => toast.classList.remove('visivel'), 4000);
+    }
+
+    function atualizarProgresso(pct) {
+      const bar  = document.getElementById('progress-bar');
+      const fill = document.getElementById('progress-fill');
+      fill.style.width  = pct + '%';
+      bar.style.display = 'block';
+      if (pct >= 100) {
+        setTimeout(() => { bar.style.display = 'none'; fill.style.width = '0%'; }, 1200);
+      }
+    }
+
+    function setBtnSalvar(loading) {
+      const btn = document.getElementById('btn-salvar');
+      btn.disabled    = loading;
+      btn.textContent = loading ? '⏳ Salvando…' : '💾 Salvar no Site';
+    }
+
+    function atualizarStats() {
+      const total   = cortesLista.length;
+      const comFoto = cortesLista.filter(({ nome }) => fotosMap[nome] && fotosMap[nome].foto).length;
+      const semFoto = total - comFoto;
+      const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = total ? v : '—'; };
+      set('stat-total',    total);
+      set('stat-com-foto', comFoto);
+      set('stat-sem-foto', semFoto);
+    }
+
+    /* ══════════════════════════════════════════════
+       TOKEN MODAL
+    ══════════════════════════════════════════════ */
+    function abrirModalToken() {
+      document.getElementById('modal-token').style.display = 'flex';
+      const input = document.getElementById('input-token');
+      input.value = getToken();
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function fecharModalToken() {
+      document.getElementById('modal-token').style.display = 'none';
+    }
+
+    async function confirmarToken() {
+      const token = document.getElementById('input-token').value.trim();
+      if (token) {
+        salvarToken(token);
+        mostrarToast('Token salvo!', 'ok');
+      } else {
+        removerToken();
+        mostrarToast('Token removido.', 'info');
+      }
+      fecharModalToken();
+      atualizarTokenBadge();
+      if (tokenConfigurado()) await recarregarFotos();
+    }
+
+    /* ══════════════════════════════════════════════
+       CSV PARSER
+    ══════════════════════════════════════════════ */
+    function splitCSVLinha(linha) {
+      const resultado = [];
+      let celula = '', emAspas = false;
+      for (const ch of linha) {
+        if (ch === '"') { emAspas = !emAspas; continue; }
+        if (ch === ',' && !emAspas) { resultado.push(celula.trim()); celula = ''; }
+        else celula += ch;
+      }
+      resultado.push(celula.trim());
+      return resultado;
+    }
+
+    function parsearCSV(csv) {
+      const linhas = csv.trim().split('\n');
+      let linhaInicio = 1;
+      for (let i = 0; i < Math.min(5, linhas.length); i++) {
+        const l = linhas[i].toLowerCase();
+        if (l.includes('categoria') || l.includes('nome do corte')) { linhaInicio = i + 1; break; }
+      }
+      const itens = [];
+      for (let i = linhaInicio; i < linhas.length; i++) {
+        const p         = splitCSVLinha(linhas[i]);
+        if (p.length < 2) continue;
+        const categoria = (p[0] || '').replace(/"/g, '').trim();
+        const nome      = (p[1] || '').replace(/"/g, '').trim();
+        if (!nome || !['bovinos','suínos','suinos','aves'].includes(categoria.toLowerCase())) continue;
+        itens.push({ categoria, nome });
+      }
+      return itens;
+    }
+
+    /* ══════════════════════════════════════════════
+       GITHUB API
+    ══════════════════════════════════════════════ */
+    async function getFileSHA(path) {
+      const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`;
+      console.log('[GitHub] getFileSHA →', url);
+      const resp = await fetch(url, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (resp.status === 404) return null;
+      const data = await resp.json();
+      return data.sha || null;
+    }
+
+    async function uploadArquivo(path, base64Content, mensagem) {
+      const sha  = await getFileSHA(path);
+      const body = { message: mensagem, content: base64Content, branch: GITHUB_CONFIG.branch };
+      if (sha) body.sha = sha;
+      const url  = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(path)}`;
+      const resp = await fetch(url, {
+        method:  'PUT',
+        headers: {
+          Authorization:  `token ${getToken()}`,
+          'Content-Type': 'application/json',
+          Accept:         'application/vnd.github.v3+json',
+        },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.message || `HTTP ${resp.status}`);
+      }
+      return await resp.json();
+    }
+
+    async function salvarFotosJson(fotosObj) {
+      const conteudo = JSON.stringify(fotosObj, null, 2);
+      const base64   = btoa(unescape(encodeURIComponent(conteudo)));
+      await uploadArquivo(GITHUB_CONFIG.fotosJsonPath, base64, 'admin: atualiza fotos.json');
+    }
+
+    async function uploadImagem(nomeArquivo, base64Puro) {
+      const path    = GITHUB_CONFIG.imagensPath + nomeArquivo;
+      const rawUrl  = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${encodePath(path)}`;
+      console.log('[GitHub] uploadImagem path →', path, '| rawUrl →', rawUrl);
+      await uploadArquivo(path, base64Puro, `foto: ${nomeArquivo}`);
+      return rawUrl;
+    }
+
+    async function carregarFotosJsonAtual() {
+      try {
+        const resp = await fetch(
+          `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${encodePath(GITHUB_CONFIG.fotosJsonPath)}`,
+          { headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' } }
+        );
+        if (resp.status === 404) return { versao: new Date().toISOString(), fallback: 'logo.png', categorias: {}, itens: {} };
+        const data    = await resp.json();
+        const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+        return JSON.parse(decoded);
+      } catch {
+        return { versao: new Date().toISOString(), fallback: 'logo.png', categorias: {}, itens: {} };
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       FILE HANDLING
+    ══════════════════════════════════════════════ */
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload  = e => resolve(e.target.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function slugify(nome) {
+      return nome
+        .toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+
+    /* ══════════════════════════════════════════════
+       RENDER
+    ══════════════════════════════════════════════ */
+    function catCSS(cat) {
+      const c = (cat || '').toLowerCase();
+      if (c === 'bovinos') return 'bovinos';
+      if (c === 'suínos' || c === 'suinos') return 'suinos';
+      if (c === 'aves') return 'aves';
+      return '';
+    }
+
+    function renderizarGrade() {
+      const grade = document.getElementById('grade-cortes');
+      grade.innerHTML = '';
+
+      if (!cortesLista.length) {
+        grade.innerHTML = '<div class="loading-msg">Nenhum corte encontrado.</div>';
+        return;
+      }
+
+      cortesLista.forEach(({ nome, categoria }) => {
+        const fotoData = fotosMap[nome];
+        const temFoto  = !!(fotoData && fotoData.foto);
+
+        const card = document.createElement('div');
+        let classes = 'card';
+        if (temFoto)         classes += ' tem-foto';
+        if (fotoData?.isNew) classes += ' nova-foto';
+        if (!temFoto)        classes += ' sem-foto';
+        card.className = classes;
+
+        const fotoArea = document.createElement('div');
+        fotoArea.className = 'card-foto-area';
+
+        if (temFoto) {
+          const img     = document.createElement('img');
+          img.src       = fotoData.foto;
+          img.className = 'card-foto';
+          img.alt       = nome;
+          img.onerror   = () => { img.style.display = 'none'; };
+          fotoArea.appendChild(img);
+
+          const btnRem       = document.createElement('button');
+          btnRem.className   = 'btn-remover';
+          btnRem.title       = 'Remover foto';
+          btnRem.textContent = '✕';
+          btnRem.addEventListener('click', e => { e.stopPropagation(); removerFoto(nome, 'item'); });
+          fotoArea.appendChild(btnRem);
+        } else {
+          const ph       = document.createElement('div');
+          ph.className   = 'card-placeholder';
+          ph.textContent = '📷';
+          fotoArea.appendChild(ph);
+        }
+
+        const overlay       = document.createElement('div');
+        overlay.className   = 'card-foto-overlay';
+        const labelTxt      = temFoto ? '📷 Alterar foto' : '📷 Adicionar foto';
+        overlay.textContent = labelTxt;
+        if (fotoData?.isNew) {
+          const badge       = document.createElement('span');
+          badge.className   = 'badge-novo';
+          badge.textContent = 'NOVO';
+          overlay.appendChild(badge);
+        }
+        fotoArea.appendChild(overlay);
+
+        fotoArea.addEventListener('click', () => selecionarFoto(nome, 'item'));
+        card.appendChild(fotoArea);
+
+        const info     = document.createElement('div');
+        info.className = 'card-info';
+        info.innerHTML = `
+          <div class="card-nome">${nome}</div>
+          <div class="card-cat ${catCSS(categoria)}">${categoria}</div>
+        `;
+        card.appendChild(info);
+
+        grade.appendChild(card);
+      });
+    }
+
+    function renderizarCategorias() {
+      const grade = document.getElementById('grade-categorias');
+      grade.innerHTML = '';
+      CATEGORIAS.forEach(({ nome, label }) => {
+        const fotoData = categoriasMap[nome];
+        const temFoto  = !!(fotoData && fotoData.foto);
+
+        const card = document.createElement('div');
+        let classes = 'card';
+        if (temFoto)         classes += ' tem-foto';
+        if (fotoData?.isNew) classes += ' nova-foto';
+        if (!temFoto)        classes += ' sem-foto';
+        card.className = classes;
+
+        const fotoArea = document.createElement('div');
+        fotoArea.className = 'card-foto-area';
+
+        if (temFoto) {
+          const img     = document.createElement('img');
+          img.src       = fotoData.foto;
+          img.className = 'card-foto';
+          img.alt       = nome;
+          img.onerror   = () => { img.style.display = 'none'; };
+          img.style.objectPosition = fotoData.position || '50% 50%';
+          fotoArea.appendChild(img);
+
+          const btnRem       = document.createElement('button');
+          btnRem.className   = 'btn-remover';
+          btnRem.title       = 'Remover foto';
+          btnRem.textContent = '✕';
+          btnRem.addEventListener('click', e => { e.stopPropagation(); removerFoto(nome, 'categoria'); });
+          fotoArea.appendChild(btnRem);
+        } else {
+          const ph       = document.createElement('div');
+          ph.className   = 'card-placeholder';
+          ph.textContent = '📷';
+          fotoArea.appendChild(ph);
+        }
+
+        const overlay       = document.createElement('div');
+        overlay.className   = 'card-foto-overlay';
+        overlay.textContent = temFoto ? '📷 Alterar foto' : '📷 Adicionar foto';
+        if (fotoData?.isNew) {
+          const badge       = document.createElement('span');
+          badge.className   = 'badge-novo';
+          badge.textContent = 'NOVO';
+          overlay.appendChild(badge);
+        }
+        fotoArea.appendChild(overlay);
+
+        fotoArea.addEventListener('click', () => selecionarFoto(nome, 'categoria'));
+        card.appendChild(fotoArea);
+
+        const info     = document.createElement('div');
+        info.className = 'card-info';
+        info.innerHTML = `
+          <div class="card-nome">${nome}</div>
+          <div class="card-cat ${catCSS(nome)}">${label}</div>
+        `;
+        card.appendChild(info);
+
+        if (temFoto) {
+          const pos = (fotoData.position || '50% 50%').split(' ');
+          const px  = parseInt(pos[0]) || 50;
+          const py  = parseInt(pos[1]) || 50;
+
+          const posControl = document.createElement('div');
+          posControl.className = 'pos-control';
+          posControl.innerHTML = `
+            <div class="pos-control-label">Posição da Imagem</div>
+            <div class="pos-slider-row">
+              <span class="pos-axis">←→</span>
+              <input type="range" min="0" max="100" value="${px}" data-axis="x" data-cat="${nome}" />
+              <span class="pos-val">${px}%</span>
+            </div>
+            <div class="pos-slider-row">
+              <span class="pos-axis">↑↓</span>
+              <input type="range" min="0" max="100" value="${py}" data-axis="y" data-cat="${nome}" />
+              <span class="pos-val">${py}%</span>
+            </div>
+          `;
+
+          posControl.querySelectorAll('input[type="range"]').forEach(slider => {
+            slider.addEventListener('input', function () {
+              const catNome = this.dataset.cat;
+              const axis    = this.dataset.axis;
+              this.nextElementSibling.textContent = this.value + '%';
+
+              const curr = (categoriasMap[catNome]?.position || '50% 50%').split(' ');
+              const newX = axis === 'x' ? this.value : parseInt(curr[0]);
+              const newY = axis === 'y' ? this.value : parseInt(curr[1]);
+              const newPos = `${newX}% ${newY}%`;
+
+              const imgEl = card.querySelector('.card-foto');
+              if (imgEl) imgEl.style.objectPosition = newPos;
+
+              if (!categoriasMap[catNome]) categoriasMap[catNome] = {};
+              categoriasMap[catNome].position      = newPos;
+              categoriasMap[catNome].positionDirty = true;
+            });
+          });
+
+          card.appendChild(posControl);
+        }
+
+        grade.appendChild(card);
+      });
+    }
+
+    /* ══════════════════════════════════════════════
+       FOTO SELECTION
+    ══════════════════════════════════════════════ */
+    function removerFoto(nome, tipo) {
+      const map = tipo === 'categoria' ? categoriasMap : fotosMap;
+      if (map[nome]?.isNew) {
+        delete map[nome];
+      } else {
+        map[nome] = { isRemoved: true };
+      }
+      if (tipo === 'categoria') {
+        renderizarCategorias();
+      } else {
+        atualizarStats();
+        renderizarGrade();
+      }
+    }
+
+    function selecionarFoto(nome, tipo = 'item') {
+      corteAtivoNome = nome;
+      corteAtivoTipo = tipo;
+      const fi = document.getElementById('file-input');
+      fi.value = '';
+      fi.click();
+    }
+
+    document.getElementById('file-input').addEventListener('change', async function () {
+      const file = this.files[0];
+      if (!file || !corteAtivoNome) return;
+
+      const base64     = await fileToBase64(file);
+      const ext        = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const previewUrl = URL.createObjectURL(file);
+      const entry      = { foto: previewUrl, alt: `${corteAtivoNome} — Açougue Ouro Verde`, isNew: true, base64, ext };
+
+      if (corteAtivoTipo === 'categoria') {
+        categoriasMap[corteAtivoNome] = entry;
+        renderizarCategorias();
+        mostrarToast(`Foto de categoria "${corteAtivoNome}" selecionada. Clique em Salvar no Site.`, 'info');
+      } else {
+        fotosMap[corteAtivoNome] = entry;
+        atualizarStats();
+        renderizarGrade();
+        mostrarToast(`Foto de "${corteAtivoNome}" selecionada. Clique em Salvar no Site.`, 'info');
+      }
+    });
+
+    /* ══════════════════════════════════════════════
+       MAIN FLOW
+    ══════════════════════════════════════════════ */
+    async function carregarCortes() {
+      const resp = await fetch(SHEET_CSV_URL + '&t=' + Date.now(), { cache: 'no-store' });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return parsearCSV(await resp.text());
+    }
+
+    async function init() {
+      atualizarTokenBadge();
+      document.getElementById('grade-cortes').innerHTML =
+        '<div class="loading-msg">Carregando cardápio…</div>';
+
+      try {
+        const [itens, fotosAtual] = await Promise.all([
+          carregarCortes(),
+          carregarFotosJsonAtual(),
+        ]);
+
+        cortesLista = itens.map(i => ({ nome: i.nome, categoria: i.categoria }));
+
+        fotosMap = {};
+        for (const [nome, data] of Object.entries(fotosAtual.itens || {})) {
+          fotosMap[nome] = { foto: data.foto, alt: data.alt, isNew: false };
+        }
+
+        categoriasMap = {};
+        for (const [nome, data] of Object.entries(fotosAtual.categorias || {})) {
+          categoriasMap[nome] = { foto: data.foto, alt: data.alt, position: data.position || '50% 50%', isNew: false };
+        }
+
+        atualizarStats();
+        renderizarCategorias();
+        renderizarGrade();
+      } catch (e) {
+        document.getElementById('grade-cortes').innerHTML =
+          `<div class="loading-msg">Erro ao carregar: ${e.message}</div>`;
+        mostrarToast('Erro ao carregar dados.', 'erro');
+      }
+    }
+
+    async function recarregarTudo() {
+      fotosMap      = {};
+      categoriasMap = {};
+      cortesLista   = [];
+      await init();
+    }
+
+    async function recarregarFotos() {
+      mostrarToast('Carregando fotos existentes…', 'info');
+      const fotosAtual = await carregarFotosJsonAtual();
+      for (const [nome, data] of Object.entries(fotosAtual.itens || {})) {
+        if (!fotosMap[nome] || !fotosMap[nome].isNew) {
+          fotosMap[nome] = { foto: data.foto, alt: data.alt, isNew: false };
+        }
+      }
+      for (const [nome, data] of Object.entries(fotosAtual.categorias || {})) {
+        if (!categoriasMap[nome] || !categoriasMap[nome].isNew) {
+          categoriasMap[nome] = { foto: data.foto, alt: data.alt, position: data.position || '50% 50%', isNew: false };
+        }
+      }
+      atualizarStats();
+      renderizarCategorias();
+      renderizarGrade();
+      mostrarToast('Fotos carregadas!', 'ok');
+    }
+
+    async function salvarNoSite() {
+      if (!tokenConfigurado()) { abrirModalToken(); return; }
+
+      const novasFotos     = Object.entries(fotosMap).filter(([, f]) => f.isNew);
+      const fotosRemovidas = Object.entries(fotosMap).filter(([, f]) => f.isRemoved);
+      const novasCats      = CATEGORIAS.filter(c => categoriasMap[c.nome]?.isNew);
+      const catsRemovidas  = CATEGORIAS.filter(c => categoriasMap[c.nome]?.isRemoved);
+      const positionsDirty = CATEGORIAS.filter(c => categoriasMap[c.nome]?.positionDirty && !categoriasMap[c.nome]?.isNew);
+
+      const totalOps = novasFotos.length + novasCats.length;
+      const temAlteracao = totalOps || fotosRemovidas.length || catsRemovidas.length || positionsDirty.length;
+
+      if (!temAlteracao) {
+        mostrarToast('Nenhuma alteração para salvar.', 'info');
+        return;
+      }
+
+      setBtnSalvar(true);
+      atualizarProgresso(0);
+
+      try {
+        const fotosAtual = await carregarFotosJsonAtual();
+        if (!fotosAtual.categorias) fotosAtual.categorias = {};
+
+        let opsDone = 0;
+
+        for (const [nome, fotoData] of novasFotos) {
+          atualizarProgresso(Math.round((opsDone / Math.max(totalOps, 1)) * 80));
+          mostrarToast(`Enviando ${opsDone + 1}/${totalOps}: ${nome}…`, 'info');
+          const rawUrl = await uploadImagem(`${slugify(nome)}.${fotoData.ext || 'jpg'}`, fotoData.base64);
+          fotosAtual.itens[nome] = { foto: rawUrl, alt: `${nome} — Açougue Ouro Verde` };
+          opsDone++;
+        }
+
+        for (const [nome] of fotosRemovidas) {
+          delete fotosAtual.itens[nome];
+        }
+
+        for (const { nome, slug } of novasCats) {
+          const fotoData = categoriasMap[nome];
+          atualizarProgresso(Math.round((opsDone / Math.max(totalOps, 1)) * 80));
+          mostrarToast(`Enviando categoria ${nome}…`, 'info');
+          const rawUrl = await uploadImagem(`${slug}.${fotoData.ext || 'jpg'}`, fotoData.base64);
+          fotosAtual.categorias[nome] = { foto: rawUrl, alt: `${nome} — Açougue Ouro Verde`, position: fotoData.position || '50% 50%' };
+          opsDone++;
+        }
+
+        for (const { nome } of catsRemovidas) {
+          delete fotosAtual.categorias[nome];
+        }
+
+        for (const { nome } of positionsDirty) {
+          if (fotosAtual.categorias[nome]) {
+            fotosAtual.categorias[nome].position = categoriasMap[nome].position || '50% 50%';
+          }
+        }
+
+        atualizarProgresso(90);
+        fotosAtual.versao = new Date().toISOString();
+        await salvarFotosJson(fotosAtual);
+
+        novasFotos.forEach(([nome])      => { fotosMap[nome].isNew = false; });
+        fotosRemovidas.forEach(([nome])  => { delete fotosMap[nome]; });
+        novasCats.forEach(({ nome })     => { categoriasMap[nome].isNew = false; });
+        catsRemovidas.forEach(({ nome }) => { delete categoriasMap[nome]; });
+        positionsDirty.forEach(({ nome }) => { categoriasMap[nome].positionDirty = false; });
+
+        atualizarProgresso(100);
+        const n = novasFotos.length + novasCats.length + fotosRemovidas.length + catsRemovidas.length + positionsDirty.length;
+        mostrarToast(`✓ ${n} alteração(ões) salva(s)! Site atualiza em 1-2 minutos.`, 'ok');
+        atualizarStats();
+        renderizarCategorias();
+        renderizarGrade();
+
+      } catch (e) {
+        console.error('[Admin] Erro:', e);
+        mostrarToast('Erro ao salvar: ' + e.message, 'erro');
+      } finally {
+        setBtnSalvar(false);
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       INIT
+    ══════════════════════════════════════════════ */
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Açougue Ouro Verde</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style-v3.css" />
+</head>
+<body>
+
+  <!-- ===== CABEÇALHO FIXO ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-logo-group">
+        <img src="logo.png" class="header-logo-img" alt="Açougue Ouro Verde"/>
+        <div class="header-title">
+          <span class="store-name">AÇOUGUE OURO VERDE</span>
+          <span class="store-tagline">Carnes Frescas · Qualidade Garantida</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-clock" id="relogio"></div>
+        <div class="status-badge" id="status-badge">
+          <span class="status-dot"></span>
+          <span id="status-text">Atualizando…</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== SLIDES ===== -->
+  <div class="slides-wrapper" id="slides-wrapper">
+
+    <!-- SLIDE 0: BOVINOS -->
+    <div class="slide active" id="slide-0">
+      <div class="s1-layout">
+        <div class="s1-fotos" id="col-fotos-bovinos"></div>
+        <div class="s1-tabela">
+          <div class="cat-hdr">
+            <span class="cat-tit">BOVINOS</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="col-hdr">
+            <span>Descrição</span>
+            <span>R$/kg</span>
+          </div>
+          <ul class="lista-itens" id="lista-bovinos">
+            <li class="item-loading">Carregando…</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 1: SUÍNOS & AVES (SPLIT) -->
+    <div class="slide" id="slide-1">
+      <div class="s2-layout">
+        <div class="s2-half">
+          <div class="cat-hdr">
+            <span class="cat-tit">SUÍNOS</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="s2-content">
+            <div class="s2-fotos" id="col-fotos-suinos"></div>
+            <div id="sp-grid-suinos" class="sp-grid-v3"></div>
+          </div>
+        </div>
+        <div class="s2-divider"></div>
+        <div class="s2-half">
+          <div class="cat-hdr verde">
+            <span class="cat-tit">AVES</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="s2-content">
+            <div class="s2-fotos" id="col-fotos-aves"></div>
+            <div id="sp-grid-aves" class="sp-grid-v3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: OFERTA ESPECIAL DO DIA -->
+    <div class="slide" id="slide-2">
+      <div class="s3-layout">
+        <div class="s3-foto-wrap" id="s3-foto-wrap">
+          <div class="s3-foto-overlay"></div>
+        </div>
+        <div class="s3-info">
+          <div class="s3-label">OFERTA ESPECIAL DO DIA</div>
+          <div class="s3-dots" id="s3-dots"></div>
+          <div class="s3-categoria" id="s3-categoria"></div>
+          <div class="s3-nome" id="s3-nome"></div>
+          <div class="s3-linha"></div>
+          <div class="s3-preco-de" id="s3-preco-de"></div>
+          <div class="of-badge">
+            <span class="of-rs">R$</span>
+            <span class="of-reais" id="s3-reais">—</span>
+            <span class="of-cents" id="s3-cents"></span>
+            <span class="of-kg">/kg</span>
+          </div>
+          <div class="s3-validade">Oferta válida somente hoje</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: MIÚDOS -->
+    <div class="slide" id="slide-3">
+      <div class="s1-layout">
+        <div class="s1-fotos" id="col-fotos-miudos"></div>
+        <div class="s1-tabela">
+          <div class="cat-hdr marrom">
+            <span class="cat-tit">MIÚDOS</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="col-hdr">
+            <span>Descrição</span>
+            <span>R$/kg</span>
+          </div>
+          <div id="sp-grid-miudos" class="sp-grid-v3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: FRIOS -->
+    <div class="slide" id="slide-4">
+      <div class="s1-layout">
+        <div class="s1-fotos" id="col-fotos-frios"></div>
+        <div class="s1-tabela">
+          <div class="cat-hdr laranja">
+            <span class="cat-tit">FRIOS</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="col-hdr">
+            <span>Descrição</span>
+            <span>R$/kg</span>
+          </div>
+          <div id="sp-grid-frios" class="sp-grid-v3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: LINGUIÇAS -->
+    <div class="slide" id="slide-5">
+      <div class="s1-layout">
+        <div class="s1-fotos" id="col-fotos-linguicas"></div>
+        <div class="s1-tabela">
+          <div class="cat-hdr roxo">
+            <span class="cat-tit">LINGUIÇAS</span>
+            <span class="cat-sub">PREÇO POR KG</span>
+          </div>
+          <div class="col-hdr">
+            <span>Descrição</span>
+            <span>R$/kg</span>
+          </div>
+          <div id="sp-grid-linguicas" class="sp-grid-v3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: ESPETOS (PREÇO POR UNIDADE) -->
+    <div class="slide" id="slide-6">
+      <div class="s1-layout">
+        <div class="s1-fotos" id="col-fotos-espetos"></div>
+        <div class="s1-tabela">
+          <div class="cat-hdr amarelo">
+            <span class="cat-tit">ESPETOS</span>
+            <span class="cat-sub">PREÇO POR UNIDADE</span>
+          </div>
+          <div class="col-hdr">
+            <span>Descrição</span>
+            <span>R$/un</span>
+          </div>
+          <div id="sp-grid-espetos" class="sp-grid-v3"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== RODAPÉ FIXO ===== -->
+  <footer class="footer">
+    <p class="footer-text">Preços atualizados automaticamente · Consulte nossos atendentes</p>
+    <div class="slide-dots" id="slide-dots"></div>
+    <p class="footer-update" id="ultima-atualizacao">—</p>
+  </footer>
+
+  <!-- Elementos ocultos que app.js precisa -->
+  <div class="hidden-targets" aria-hidden="true">
+    <ul id="lista-ofertas"></ul>
+  </div>
+
+  <script src="app.js"></script>
+
+  <script>
+    /* V3 EXPANDIDO — Injeção de imagens de categoria */
+
+    function injetarImagensCategoria(colId, gridId) {
+      const col  = document.getElementById(colId);
+      const grid = document.getElementById(gridId);
+      if (!col || !grid || typeof criarImgComFallback !== 'function') return;
+
+      const cards = Array.from(grid.querySelectorAll('.sp-card'));
+      if (!cards.length) return;
+
+      const nomes = cards.slice(0, 2)
+        .map(el => el.querySelector('.sp-card-nome')?.textContent?.trim() || '')
+        .filter(Boolean);
+
+      col.innerHTML = '';
+      nomes.forEach(nome => {
+        const wrap = document.createElement('div');
+        wrap.className = 'foto-cell';
+        wrap.appendChild(criarImgComFallback(nome, 'foto-corte'));
+        col.appendChild(wrap);
+      });
+    }
+
+    // Observers para cada grid
+    const grids = [
+      { col: 'col-fotos-miudos', grid: 'sp-grid-miudos' },
+      { col: 'col-fotos-frios', grid: 'sp-grid-frios' },
+      { col: 'col-fotos-linguicas', grid: 'sp-grid-linguicas' },
+      { col: 'col-fotos-espetos', grid: 'sp-grid-espetos' }
+    ];
+
+    grids.forEach(({ col, grid }) => {
+      const obsv = new MutationObserver(() => injetarImagensCategoria(col, grid));
+      const gridEl = document.getElementById(grid);
+      if (gridEl) {
+        obsv.observe(gridEl, { childList: true });
+        // Guard contra race condition
+        injetarImagensCategoria(col, grid);
+      }
+    });
+  </script>
+</body>
+</html>

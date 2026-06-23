@@ -1,0 +1,54 @@
+{
+  "versao": "2026-06-01T21:05:01.320Z",
+  "fallback": "logo.png",
+  "itens": {
+    "Sobrecoxa": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/sobrecoxa.png",
+      "alt": "Sobrecoxa — Açougue Ouro Verde"
+    },
+    "Filé Mignon": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/file-mignon.png",
+      "alt": "Filé Mignon — Açougue Ouro Verde"
+    },
+    "Picanha": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/picanha.jpeg",
+      "alt": "Picanha — Açougue Ouro Verde"
+    },
+    "Alcatra": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/alcatra.jpeg",
+      "alt": "Alcatra — Açougue Ouro Verde"
+    },
+    "Maminha": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/maminha.jpeg",
+      "alt": "Maminha — Açougue Ouro Verde"
+    },
+    "Peito de Frango": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/peito-de-frango.jpeg",
+      "alt": "Peito de Frango — Açougue Ouro Verde"
+    },
+    "Contra-filé": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/contra-file.jpeg",
+      "alt": "Contra-filé — Açougue Ouro Verde"
+    },
+    "Bisteca Suina": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/bisteca-suina.jpeg",
+      "alt": "Bisteca Suina — Açougue Ouro Verde"
+    }
+  },
+  "categorias": {
+    "Bovinos": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/cat-bovinos.png",
+      "alt": "Bovinos — Açougue Ouro Verde"
+    },
+    "Suinos": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/cat-suinos.jpg",
+      "alt": "Suinos — Açougue Ouro Verde",
+      "position": "55% 26%"
+    },
+    "Aves": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/cat-aves.jpg",
+      "alt": "Aves — Açougue Ouro Verde",
+      "position": "40% 21%"
+    }
+  }
+}

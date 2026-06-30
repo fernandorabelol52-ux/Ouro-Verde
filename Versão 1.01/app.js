@@ -112,6 +112,52 @@ function getFoto(nomeCorte) {
   return entrada.foto;
 }
 
+/* Retorna { foto, position } da categoria, ou null se não houver.
+   Busca com nome normalizado (sem acento) para casar "Suínos"/"Suinos". */
+function getFotoCategoria(categoria) {
+  const k = (categoria || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const entrada = CATEGORIAS_MAP[k];
+  if (!entrada || !entrada.foto) return null;
+  return { foto: entrada.foto, position: entrada.position || '50% 50%' };
+}
+
+/* Preenche a coluna de fotos de um slide com a regra:
+   1) foto de CATEGORIA, se existir;
+   2) senão, fotos por ITEM (primeiros nomes), se existirem;
+   3) senão, fallback (logo) entra via onerror de criarImgComFallback.
+   `nomes` = array de nomes de item para o fallback por item. */
+function injetarFotosColuna(colId, categoria, nomes, maxItens = 2) {
+  const col = document.getElementById(colId);
+  if (!col || typeof criarImgComFallback !== 'function') return;
+
+  const cat = getFotoCategoria(categoria);
+
+  col.innerHTML = '';
+
+  if (cat) {
+    // Foto única de categoria, ocupando a coluna toda
+    const wrap = document.createElement('div');
+    wrap.className = 'foto-cell';
+    const img = criarImgComFallback(categoria, 'foto-corte');
+    img.src = cat.foto;
+    img.style.objectPosition = cat.position;
+    wrap.appendChild(img);
+    col.appendChild(wrap);
+    return;
+  }
+
+  // Fallback: fotos por item
+  const nomesValidos = (nomes || []).filter(Boolean).slice(0, maxItens);
+  if (!nomesValidos.length) return;
+
+  nomesValidos.forEach(nome => {
+    const wrap = document.createElement('div');
+    wrap.className = 'foto-cell';
+    wrap.appendChild(criarImgComFallback(nome, 'foto-corte'));
+    col.appendChild(wrap);
+  });
+}
+
 function criarImgComFallback(nomeCorte, cssClass) {
   const src = getFoto(nomeCorte);
   const alt = FOTOS_MAP[nomeCorte]?.alt || nomeCorte;
@@ -299,25 +345,40 @@ function renderSlide(idx, dados) {
       renderizarColuna('lista-bovinos', dados.bovinos);
       renderizarColuna('lista-suinos',  dados.suinosAves);
       renderizarOfertas(dados.promocoes);
+      // Foto da coluna de Bovinos: categoria → primeiros itens → logo
+      injetarFotosColuna('col-fotos-bovinos', 'Bovinos',
+        dados.bovinos.map(i => i.nome), 3);
       break;
     case 1:
       renderizarGridGenerico('sp-grid-suinos', dados.suinos);
       renderizarGridGenerico('sp-grid-aves',   dados.aves);
+      injetarFotosColuna('col-fotos-suinos', 'Suinos',
+        dados.suinos.map(i => i.nome), 2);
+      injetarFotosColuna('col-fotos-aves', 'Aves',
+        dados.aves.map(i => i.nome), 2);
       break;
     case 2:
       renderizarSlide4(dados.promocoes);
       break;
     case 3:
       renderizarGridGenerico('sp-grid-miudos', dados.miudos);
+      injetarFotosColuna('col-fotos-miudos', 'Miudos',
+        dados.miudos.map(i => i.nome), 3);
       break;
     case 4:
       renderizarGridGenerico('sp-grid-frios', dados.frios);
+      injetarFotosColuna('col-fotos-frios', 'Frios',
+        dados.frios.map(i => i.nome), 3);
       break;
     case 5:
       renderizarGridGenerico('sp-grid-linguicas', dados.linguicas);
+      injetarFotosColuna('col-fotos-linguicas', 'Linguicas',
+        dados.linguicas.map(i => i.nome), 3);
       break;
     case 6:
       renderizarGridGenerico('sp-grid-espetos', dados.espetos);
+      injetarFotosColuna('col-fotos-espetos', 'Espetos',
+        dados.espetos.map(i => i.nome), 3);
       break;
   }
 }

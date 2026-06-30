@@ -193,48 +193,5 @@
   </div>
 
   <script src="app.js"></script>
-
-  <script>
-    /* V3 EXPANDIDO — Injeção de imagens de categoria */
-
-    function injetarImagensCategoria(colId, gridId) {
-      const col  = document.getElementById(colId);
-      const grid = document.getElementById(gridId);
-      if (!col || !grid || typeof criarImgComFallback !== 'function') return;
-
-      const cards = Array.from(grid.querySelectorAll('.sp-card'));
-      if (!cards.length) return;
-
-      const nomes = cards.slice(0, 2)
-        .map(el => el.querySelector('.sp-card-nome')?.textContent?.trim() || '')
-        .filter(Boolean);
-
-      col.innerHTML = '';
-      nomes.forEach(nome => {
-        const wrap = document.createElement('div');
-        wrap.className = 'foto-cell';
-        wrap.appendChild(criarImgComFallback(nome, 'foto-corte'));
-        col.appendChild(wrap);
-      });
-    }
-
-    // Observers para cada grid
-    const grids = [
-      { col: 'col-fotos-miudos', grid: 'sp-grid-miudos' },
-      { col: 'col-fotos-frios', grid: 'sp-grid-frios' },
-      { col: 'col-fotos-linguicas', grid: 'sp-grid-linguicas' },
-      { col: 'col-fotos-espetos', grid: 'sp-grid-espetos' }
-    ];
-
-    grids.forEach(({ col, grid }) => {
-      const obsv = new MutationObserver(() => injetarImagensCategoria(col, grid));
-      const gridEl = document.getElementById(grid);
-      if (gridEl) {
-        obsv.observe(gridEl, { childList: true });
-        // Guard contra race condition
-        injetarImagensCategoria(col, grid);
-      }
-    });
-  </script>
 </body>
 </html>

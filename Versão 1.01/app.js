@@ -340,15 +340,20 @@ function ajustarGrid(grid, nItens, modoHalf = false) {
 
 function renderSlide(idx, dados) {
   switch (idx) {
-    case 0:
-      // Bovinos + Suínos + Aves na primeira tela
-      renderizarColuna('lista-bovinos', dados.bovinos);
-      renderizarColuna('lista-suinos',  dados.suinosAves);
+    case 0: {
+      // Bovinos em duas colunas: primeira metade e segunda metade
+      const metade = Math.ceil(dados.bovinos.length / 2);
+      const bovinosA = dados.bovinos.slice(0, metade);
+      const bovinosB = dados.bovinos.slice(metade);
+      renderizarGridGenerico('sp-grid-bovinos-a', bovinosA);
+      renderizarGridGenerico('sp-grid-bovinos-b', bovinosB);
+      injetarFotosColuna('col-fotos-bovinos-a', 'Bovinos',
+        bovinosA.map(i => i.nome), 2);
+      injetarFotosColuna('col-fotos-bovinos-b', 'Bovinos',
+        bovinosB.map(i => i.nome), 2);
       renderizarOfertas(dados.promocoes);
-      // Foto da coluna de Bovinos: categoria → primeiros itens → logo
-      injetarFotosColuna('col-fotos-bovinos', 'Bovinos',
-        dados.bovinos.map(i => i.nome), 3);
       break;
+    }
     case 1:
       renderizarGridGenerico('sp-grid-suinos', dados.suinos);
       renderizarGridGenerico('sp-grid-aves',   dados.aves);

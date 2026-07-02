@@ -1,46 +1,63 @@
 /**
  * ============================================================
  *  MENU DIGITAL – AÇOUGUE OURO VERDE
- *  app.js — Sistema de Slides + Fetch CSV (EXPANDIDO v2)
+ *  app.js — Slides dinâmicos com divisão automática por página
+ *
+ *  Lógica de paginação por categoria:
+ *   ≤ ITENS_POR_COLUNA      → 1 slide, 1 coluna + foto
+ *   ≤ ITENS_POR_COLUNA * 2  → 1 slide, 2 colunas
+ *   > ITENS_POR_COLUNA * 2  → múltiplos slides de 2 colunas cada
  *
  *  Estrutura do CSV:
- *  A: Categoria | B: Nome do Corte | C: Preço Base
- *  D: Desconto  | E: Preço Final   | F: Promoção?
- *  G: Visível na TV?
- * ============================================================
- */
+ *  A: Categoria | B: Nome | C: Preço Base | D: Desconto
+ *  E: Preço Final | F: Promoção? | G: Visível na TV?
+ * ============================================================ */
 
 // ─── URL DA PLANILHA ─────────────────────────────────────────
 const SHEET_CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEq8oeTNFgdAnWZIGOrmoU8QO7WqlMAyvXLPS5rToesYvZdNaoJAgj3pyVcNpPHo8Sk4ty_IukrWt9/pub?gid=1408167426&single=true&output=csv';
 
-// ─── FOTOS JSON ───────────────────────────────────────────────
-const FOTOS_JSON_URL = 'fotos.json';
-// ─────────────────────────────────────────────────────────────
-
+const FOTOS_JSON_URL     = 'fotos.json';
 const INTERVALO_MINUTOS  = 5;
 const NOME_LOJA          = 'Açougue Ouro Verde';
-const SLIDE_DURATION_MS  = 12000;   // 12 s por tela
-const SLIDE_FADE_MS      = 800;     // 0.8 s de fade
+const SLIDE_DURATION_MS  = 12000;
+const SLIDE_FADE_MS      = 800;
+
+// Máximo de itens visíveis por coluna (TV 1080px, header 68, footer 44, cat-hdr ~46, col-hdr ~24 = ~898px úteis, cada row ~32px)
+const ITENS_POR_COLUNA = 26;
 
 /* ============================================================
    ESTADO GLOBAL
    ============================================================ */
-let dadosGlobais        = null;
-let temPromocoes        = false;
-let carregouUmaVez      = false;
+let dadosGlobais   = null;
+let temPromocoes   = false;
+let carregouUmaVez = false;
 
-// Sistema de slides
-let slideEls            = [];
-let currentSlideIdx     = 0;
-let slideTimer          = null;
-let isTransitioning     = false;
-let pendingData         = {};
+// Sistema de slides — dinâmico
+let slideEls         = [];       // elementos .slide no DOM
+let slideRotacao     = [];       // lista ordenada de ids de slide a mostrar
+let currentSlideId   = null;     // id do slide ativo (string, ex: 'slide-bovinos-0')
+let slideTimer       = null;
+let isTransitioning  = false;
+let pendingRender    = null;     // função a chamar após transição do slide ativo
 
-/* ── FOTOS (V3) ── */
+// Fotos
 let FOTOS_MAP      = {};
 let FOTO_FALLBACK  = 'logo.png';
 let CATEGORIAS_MAP = {};
+
+/* ============================================================
+   CONFIG DAS CATEGORIAS (ordem de exibição + cores do header)
+   ============================================================ */
+const CATEGORIAS_CONFIG = [
+  { key: 'bovinos',   label: 'BOVINOS',   sub: 'PREÇO POR KG',       cor: '',        keys: ['bovinos'] },
+  { key: 'suinos',    label: 'SUÍNOS',    sub: 'PREÇO POR KG',       cor: '',        keys: ['suínos','suinos'] },
+  { key: 'aves',      label: 'AVES',      sub: 'PREÇO POR KG',       cor: 'verde',   keys: ['aves'] },
+  { key: 'miudos',    label: 'MIÚDOS',    sub: 'PREÇO POR KG',       cor: 'marrom',  keys: ['miúdos','miudos'] },
+  { key: 'frios',     label: 'FRIOS',     sub: 'PREÇO POR KG',       cor: 'laranja', keys: ['frios'] },
+  { key: 'linguicas', label: 'LINGUIÇAS', sub: 'PREÇO POR KG',       cor: 'roxo',    keys: ['linguiças','linguicas'] },
+  { key: 'espetos',   label: 'ESPETOS',   sub: 'PREÇO POR UNIDADE',  cor: 'amarelo', keys: ['espetos'] },
+];
 
 /* ============================================================
    RELÓGIO
@@ -48,7 +65,7 @@ let CATEGORIAS_MAP = {};
 function atualizarRelogio() {
   const el = document.getElementById('relogio');
   if (!el) return;
-  const n = new Date();
+  const n    = new Date();
   const hh   = String(n.getHours()).padStart(2, '0');
   const mm   = String(n.getMinutes()).padStart(2, '0');
   const dias  = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
@@ -77,15 +94,12 @@ function setStatus(estado, texto) {
   if (txtEl) txtEl.textContent = texto;
 }
 
-/* ============================================================
-   DETECÇÃO DE UNIDADE (kg vs /un para Espetos)
-   ============================================================ */
 function getUnidade(categoria) {
-  return categoria && categoria.toLowerCase() === 'espetos' ? '/un' : '/kg';
+  return (categoria || '').toLowerCase() === 'espetos' ? '/un' : '/kg';
 }
 
 /* ============================================================
-   FOTOS — V3  (lê de fotos.json)
+   FOTOS
    ============================================================ */
 async function carregarFotos() {
   try {
@@ -96,12 +110,12 @@ async function carregarFotos() {
     FOTO_FALLBACK = dados.fallback || 'logo.png';
     CATEGORIAS_MAP = {};
     for (const [k, v] of Object.entries(dados.categorias || {})) {
-      const kNorm = k.normalize('NFD').replace(/[̀-ͯ]/g, '');
+      const kNorm = k.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       CATEGORIAS_MAP[kNorm] = v;
     }
-    console.info('[Fotos] Loaded:', Object.keys(FOTOS_MAP).length, 'photos');
+    console.info('[Fotos] Carregadas:', Object.keys(FOTOS_MAP).length);
   } catch (e) {
-    console.warn('[Fotos] Using fallback:', e.message);
+    console.warn('[Fotos] Fallback:', e.message);
     FOTOS_MAP = {};
   }
 }
@@ -112,50 +126,11 @@ function getFoto(nomeCorte) {
   return entrada.foto;
 }
 
-/* Retorna { foto, position } da categoria, ou null se não houver.
-   Busca com nome normalizado (sem acento) para casar "Suínos"/"Suinos". */
 function getFotoCategoria(categoria) {
   const k = (categoria || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const entrada = CATEGORIAS_MAP[k];
   if (!entrada || !entrada.foto) return null;
   return { foto: entrada.foto, position: entrada.position || '50% 50%' };
-}
-
-/* Preenche a coluna de fotos de um slide com a regra:
-   1) foto de CATEGORIA, se existir;
-   2) senão, fotos por ITEM (primeiros nomes), se existirem;
-   3) senão, fallback (logo) entra via onerror de criarImgComFallback.
-   `nomes` = array de nomes de item para o fallback por item. */
-function injetarFotosColuna(colId, categoria, nomes, maxItens = 2) {
-  const col = document.getElementById(colId);
-  if (!col || typeof criarImgComFallback !== 'function') return;
-
-  const cat = getFotoCategoria(categoria);
-
-  col.innerHTML = '';
-
-  if (cat) {
-    // Foto única de categoria, ocupando a coluna toda
-    const wrap = document.createElement('div');
-    wrap.className = 'foto-cell';
-    const img = criarImgComFallback(categoria, 'foto-corte');
-    img.src = cat.foto;
-    img.style.objectPosition = cat.position;
-    wrap.appendChild(img);
-    col.appendChild(wrap);
-    return;
-  }
-
-  // Fallback: fotos por item
-  const nomesValidos = (nomes || []).filter(Boolean).slice(0, maxItens);
-  if (!nomesValidos.length) return;
-
-  nomesValidos.forEach(nome => {
-    const wrap = document.createElement('div');
-    wrap.className = 'foto-cell';
-    wrap.appendChild(criarImgComFallback(nome, 'foto-corte'));
-    col.appendChild(wrap);
-  });
 }
 
 function criarImgComFallback(nomeCorte, cssClass) {
@@ -169,8 +144,8 @@ function criarImgComFallback(nomeCorte, cssClass) {
     if (this.src.endsWith(FOTO_FALLBACK)) {
       this.style.display = 'none';
       const ph = document.createElement('div');
-      ph.className = 'foto-placeholder';
-      ph.textContent = nomeCorte.substring(0,2).toUpperCase();
+      ph.className   = 'foto-placeholder';
+      ph.textContent = nomeCorte.substring(0, 2).toUpperCase();
       this.parentNode?.insertBefore(ph, this);
     } else {
       this.src = FOTO_FALLBACK;
@@ -179,13 +154,37 @@ function criarImgComFallback(nomeCorte, cssClass) {
   return img;
 }
 
+function injetarFotosColuna(colEl, categoriaKey, nomes, maxItens = 2) {
+  if (!colEl) return;
+  const cat = getFotoCategoria(categoriaKey);
+  colEl.innerHTML = '';
+
+  if (cat) {
+    const wrap = document.createElement('div');
+    wrap.className = 'foto-cell';
+    const img = criarImgComFallback(categoriaKey, 'foto-corte');
+    img.src = cat.foto;
+    img.style.objectPosition = cat.position;
+    wrap.appendChild(img);
+    colEl.appendChild(wrap);
+    return;
+  }
+
+  const nomesValidos = (nomes || []).filter(Boolean).slice(0, maxItens);
+  nomesValidos.forEach(nome => {
+    const wrap = document.createElement('div');
+    wrap.className = 'foto-cell';
+    wrap.appendChild(criarImgComFallback(nome, 'foto-corte'));
+    colEl.appendChild(wrap);
+  });
+}
+
 /* ============================================================
    PARSER CSV
    ============================================================ */
 function splitCSVLinha(linha) {
   const resultado = [];
-  let celula = '';
-  let emAspas = false;
+  let celula = '', emAspas = false;
   for (const ch of linha) {
     if (ch === '"') { emAspas = !emAspas; continue; }
     if (ch === ',' && !emAspas) { resultado.push(celula.trim()); celula = ''; }
@@ -210,7 +209,6 @@ function parsearCSV(csv) {
   for (let i = linhaInicio; i < linhas.length; i++) {
     const p = splitCSVLinha(linhas[i]);
     if (p.length < 2) continue;
-
     const categoria   = (p[0] || '').replace(/"/g, '').trim();
     const nome        = (p[1] || '').replace(/"/g, '').trim();
     const preco_base  = parseFloat((p[2] || '0').replace(/[R$\s]/g, '').replace(',', '.')) || 0;
@@ -218,71 +216,167 @@ function parsearCSV(csv) {
     const preco_final = parseFloat((p[4] || '0').replace(/[R$\s]/g, '').replace(',', '.')) || preco_base;
     const promocao    = (p[5] || 'NÃO').replace(/"/g, '').trim().toUpperCase();
     const visivel     = (p[6] || 'SIM').replace(/"/g, '').trim().toUpperCase();
-
     if (!nome) continue;
-
     itens.push({ categoria, nome, preco_base, desconto, preco_final, promocao, visivel });
   }
   return itens;
 }
 
 /* ============================================================
-   RENDERIZAÇÃO — FUNÇÕES BÁSICAS
+   LÓGICA DE PAGINAÇÃO
+   Recebe array de itens e retorna array de "páginas"
+   Cada página = array de até ITENS_POR_COLUNA * 2 itens
    ============================================================ */
-
-function renderizarColuna(elId, itens) {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  el.classList.add('atualizando');
-
-  setTimeout(() => {
-    el.innerHTML = '';
-    if (!itens.length) {
-      el.innerHTML = '<li class="item-loading">Sem itens nesta categoria.</li>';
-      el.classList.remove('atualizando');
-      return;
-    }
-
-    const grupos = {};
-    itens.forEach(item => {
-      if (!grupos[item.categoria]) grupos[item.categoria] = [];
-      grupos[item.categoria].push(item);
-    });
-
-    Object.entries(grupos).forEach(([cat, lista]) => {
-      if (Object.keys(grupos).length > 1) {
-        const sep = document.createElement('li');
-        sep.className   = 'item-secao';
-        sep.textContent = cat.toUpperCase();
-        el.appendChild(sep);
-      }
-
-      lista.forEach(item => {
-        const ehPromo = item.promocao === 'SIM' && item.desconto > 0;
-        const li = document.createElement('li');
-        li.className = 'item-row' + (ehPromo ? ' em-promo' : '');
-
-        const unidade = getUnidade(cat);
-        const precoDeHTML = ehPromo
-          ? `<span class="item-preco-de">${fmt(item.preco_base)}</span>`
-          : '';
-
-        li.innerHTML = `
-          <span class="item-nome">${item.nome}</span>
-          ${precoDeHTML}
-          <span class="item-dots"></span>
-          <span class="item-preco">${fmt(item.preco_final)}</span>
-          <span class="item-unidade">${unidade}</span>
-        `;
-        el.appendChild(li);
-      });
-    });
-
-    el.classList.remove('atualizando');
-  }, 300);
+function paginarItens(itens) {
+  const MAX_POR_PAGINA = ITENS_POR_COLUNA * 2;
+  const paginas = [];
+  for (let i = 0; i < itens.length; i += MAX_POR_PAGINA) {
+    paginas.push(itens.slice(i, i + MAX_POR_PAGINA));
+  }
+  return paginas.length ? paginas : [[]];
 }
 
-function renderizarGridGenerico(gridId, itens, modoHalf = false) {
+/* ============================================================
+   CONSTRUÇÃO DINÂMICA DOS SLIDES NO DOM
+   Apaga o wrapper e reconstrói tudo baseado nos dados atuais
+   ============================================================ */
+function construirSlides(dados) {
+  const wrapper = document.getElementById('slides-wrapper');
+  wrapper.innerHTML = '';
+  slideEls     = [];
+  slideRotacao = [];
+
+  let idx = 0;
+
+  // ── Categorias regulares ──────────────────────────────────
+  CATEGORIAS_CONFIG.forEach(cfg => {
+    const itens  = dados[cfg.key] || [];
+    const paginas = paginarItens(itens);
+
+    paginas.forEach((paginaItens, pNum) => {
+      const slideId = `slide-${cfg.key}-${pNum}`;
+      const totalPaginas = paginas.length;
+
+      // Título com indicador de página se houver mais de uma
+      const titulo = totalPaginas > 1
+        ? `${cfg.label} <span class="cat-pag">(${pNum + 1}/${totalPaginas})</span>`
+        : cfg.label;
+
+      const usaDuasColunas = paginaItens.length > ITENS_POR_COLUNA;
+      const metade = usaDuasColunas ? Math.ceil(paginaItens.length / 2) : paginaItens.length;
+      const colunaA = paginaItens.slice(0, metade);
+      const colunaB = usaDuasColunas ? paginaItens.slice(metade) : [];
+
+      const slideEl = document.createElement('div');
+      slideEl.className = 'slide';
+      slideEl.id        = slideId;
+
+      if (usaDuasColunas) {
+        // Layout de 2 colunas
+        slideEl.innerHTML = `
+          <div class="s2-layout">
+            <div class="s2-half">
+              <div class="cat-hdr ${cfg.cor}">
+                <span class="cat-tit">${titulo}</span>
+                <span class="cat-sub">${cfg.sub}</span>
+              </div>
+              <div class="s2-content">
+                <div class="s2-fotos" id="fotos-${slideId}-a"></div>
+                <div id="grid-${slideId}-a" class="sp-grid-v3"></div>
+              </div>
+            </div>
+            <div class="s2-divider"></div>
+            <div class="s2-half">
+              <div class="cat-hdr ${cfg.cor}">
+                <span class="cat-tit">${titulo}</span>
+                <span class="cat-sub">${cfg.sub}</span>
+              </div>
+              <div class="s2-content">
+                <div class="s2-fotos" id="fotos-${slideId}-b"></div>
+                <div id="grid-${slideId}-b" class="sp-grid-v3"></div>
+              </div>
+            </div>
+          </div>`;
+
+        preencherGrid(`grid-${slideId}-a`, colunaA);
+        preencherGrid(`grid-${slideId}-b`, colunaB);
+        injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}-a`), cfg.key, colunaA.map(i => i.nome), 2);
+        injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}-b`), cfg.key, colunaB.map(i => i.nome), 2);
+
+      } else {
+        // Layout de 1 coluna
+        slideEl.innerHTML = `
+          <div class="s1-layout">
+            <div class="s1-fotos" id="fotos-${slideId}"></div>
+            <div class="s1-tabela">
+              <div class="cat-hdr ${cfg.cor}">
+                <span class="cat-tit">${titulo}</span>
+                <span class="cat-sub">${cfg.sub}</span>
+              </div>
+              <div id="grid-${slideId}" class="sp-grid-v3"></div>
+            </div>
+          </div>`;
+
+        preencherGrid(`grid-${slideId}`, paginaItens);
+        injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}`), cfg.key, paginaItens.map(i => i.nome), 3);
+      }
+
+      wrapper.appendChild(slideEl);
+      slideEls.push(slideEl);
+      slideRotacao.push(slideId);
+      idx++;
+    });
+  });
+
+  // ── Slide de Oferta do Dia (só aparece se houver promoções) ─
+  if (temPromocoes) {
+    const slideOferta = document.createElement('div');
+    slideOferta.className = 'slide';
+    slideOferta.id        = 'slide-oferta';
+    slideOferta.innerHTML = `
+      <div class="s3-layout">
+        <div class="s3-foto-wrap" id="s3-foto-wrap">
+          <div class="s3-foto-overlay"></div>
+        </div>
+        <div class="s3-info">
+          <div class="s3-label">OFERTA ESPECIAL DO DIA</div>
+          <div class="s3-dots" id="s3-dots"></div>
+          <div class="s3-categoria" id="s3-categoria"></div>
+          <div class="s3-nome" id="s3-nome"></div>
+          <div class="s3-linha"></div>
+          <div class="s3-preco-de" id="s3-preco-de"></div>
+          <div class="of-badge">
+            <span class="of-rs">R$</span>
+            <span class="of-reais" id="s3-reais">—</span>
+            <span class="of-cents" id="s3-cents"></span>
+            <span class="of-kg">/kg</span>
+          </div>
+          <div class="s3-validade">Oferta válida somente hoje</div>
+        </div>
+      </div>`;
+    wrapper.appendChild(slideOferta);
+    slideEls.push(slideOferta);
+    slideRotacao.push('slide-oferta');
+  }
+
+  // ── Renderizar ofertas na lista oculta (carrossel) ──────────
+  renderizarOfertas(dados.promocoes);
+
+  // ── Ativar primeiro slide ───────────────────────────────────
+  if (slideEls.length) {
+    // Se o slide atual ainda existe na nova lista, mantém; senão vai ao primeiro
+    const mantemAtual = currentSlideId && slideRotacao.includes(currentSlideId);
+    if (!mantemAtual) {
+      currentSlideId = slideRotacao[0];
+    }
+    slideEls.forEach(el => el.classList.toggle('active', el.id === currentSlideId));
+  }
+}
+
+/* ============================================================
+   PREENCHE UM GRID COM ITENS
+   ============================================================ */
+function preencherGrid(gridId, itens) {
   const grid = document.getElementById(gridId);
   if (!grid) return;
   grid.innerHTML = '';
@@ -295,197 +389,146 @@ function renderizarGridGenerico(gridId, itens, modoHalf = false) {
   itens.forEach(item => {
     const ehPromo = item.promocao === 'SIM' && item.desconto > 0;
     const pct = (ehPromo && item.preco_base > 0)
-      ? Math.round((item.desconto / item.preco_base) * 100)
-      : 0;
-
+      ? Math.round((item.desconto / item.preco_base) * 100) : 0;
+    const unidade     = getUnidade(item.categoria);
+    const promoBadge  = ehPromo ? `<span class="sp-card-promo-badge">${pct > 0 ? '-'+pct+'%' : 'PROMO'}</span>` : '';
+    const precoDeHTML = ehPromo ? `<span class="sp-card-preco-de">${fmt(item.preco_base)}</span>` : '';
     const card = document.createElement('div');
     card.className = 'sp-card';
-
-    const unidade = getUnidade(item.categoria);
-    const promoBadge  = ehPromo
-      ? `<span class="sp-card-promo-badge">${pct > 0 ? '-' + pct + '%' : 'PROMO'}</span>`
-      : '';
-    const precoDeHTML = ehPromo
-      ? `<span class="sp-card-preco-de">${fmt(item.preco_base)}</span>`
-      : '';
-
     card.innerHTML = `
       ${promoBadge}
       <span class="sp-card-nome">${item.nome}</span>
       ${precoDeHTML}
       <span class="sp-card-preco">${fmt(item.preco_final)}</span>
-      <span class="sp-card-kg">${unidade}</span>
-    `;
+      <span class="sp-card-kg">${unidade}</span>`;
     grid.appendChild(card);
   });
-
-  ajustarGrid(grid, itens.length, modoHalf);
-}
-
-function ajustarGrid(grid, nItens, modoHalf = false) {
-  let nCols;
-  if (modoHalf) {
-    nCols = nItens <= 2 ? 1 : 2;
-  } else {
-    nCols = nItens <= 4 ? 2 : nItens <= 9 ? 3 : 4;
-  }
-  const nRows = Math.ceil(nItens / nCols);
-  grid.style.gridTemplateColumns = `repeat(${nCols}, 1fr)`;
-  grid.style.gridTemplateRows    = `repeat(${nRows}, 1fr)`;
 }
 
 /* ============================================================
-   RENDERIZAÇÃO — POR SLIDE INDEX
+   CARROSSEL DE OFERTA DO DIA
    ============================================================ */
-
-function renderSlide(idx, dados) {
-  switch (idx) {
-    case 0: {
-      // Bovinos em duas colunas: primeira metade e segunda metade
-      const metade = Math.ceil(dados.bovinos.length / 2);
-      const bovinosA = dados.bovinos.slice(0, metade);
-      const bovinosB = dados.bovinos.slice(metade);
-      renderizarGridGenerico('sp-grid-bovinos-a', bovinosA);
-      renderizarGridGenerico('sp-grid-bovinos-b', bovinosB);
-      injetarFotosColuna('col-fotos-bovinos-a', 'Bovinos',
-        bovinosA.map(i => i.nome), 2);
-      injetarFotosColuna('col-fotos-bovinos-b', 'Bovinos',
-        bovinosB.map(i => i.nome), 2);
-      renderizarOfertas(dados.promocoes);
-      break;
-    }
-    case 1:
-      renderizarGridGenerico('sp-grid-suinos', dados.suinos);
-      renderizarGridGenerico('sp-grid-aves',   dados.aves);
-      injetarFotosColuna('col-fotos-suinos', 'Suinos',
-        dados.suinos.map(i => i.nome), 2);
-      injetarFotosColuna('col-fotos-aves', 'Aves',
-        dados.aves.map(i => i.nome), 2);
-      break;
-    case 2:
-      renderizarSlide4(dados.promocoes);
-      break;
-    case 3:
-      renderizarGridGenerico('sp-grid-miudos', dados.miudos);
-      injetarFotosColuna('col-fotos-miudos', 'Miudos',
-        dados.miudos.map(i => i.nome), 3);
-      break;
-    case 4:
-      renderizarGridGenerico('sp-grid-frios', dados.frios);
-      injetarFotosColuna('col-fotos-frios', 'Frios',
-        dados.frios.map(i => i.nome), 3);
-      break;
-    case 5:
-      renderizarGridGenerico('sp-grid-linguicas', dados.linguicas);
-      injetarFotosColuna('col-fotos-linguicas', 'Linguicas',
-        dados.linguicas.map(i => i.nome), 3);
-      break;
-    case 6:
-      renderizarGridGenerico('sp-grid-espetos', dados.espetos);
-      injetarFotosColuna('col-fotos-espetos', 'Espetos',
-        dados.espetos.map(i => i.nome), 3);
-      break;
-  }
-}
-
 function renderizarOfertas(ofertas) {
   const el = document.getElementById('lista-ofertas');
   if (!el) return;
-  el.classList.add('atualizando');
+  el.innerHTML = '';
+  if (!ofertas.length) return;
 
-  setTimeout(() => {
-    el.innerHTML = '';
-    if (!ofertas.length) {
-      el.innerHTML = '<li class="oferta-vazio">Sem ofertas especiais hoje.<br>Consulte nossos atendentes!</li>';
-      el.classList.remove('atualizando');
-      return;
-    }
+  ofertas.forEach((item, i) => {
+    const pct = item.preco_base > 0 ? Math.round((item.desconto / item.preco_base) * 100) : 0;
+    const li  = document.createElement('li');
+    li.className = 'oferta-item';
+    li.innerHTML = `
+      <div class="oferta-top-row">
+        <span class="oferta-categoria">${item.categoria}</span>
+        ${pct > 0 ? `<span class="oferta-badge-pct">-${pct}%</span>` : ''}
+      </div>
+      <span class="oferta-nome">${item.nome}</span>
+      <div class="oferta-preco-row">
+        ${item.desconto > 0 ? `<span class="oferta-preco-de">${fmt(item.preco_base)}</span>` : ''}
+        <span class="oferta-preco-por">${fmt(item.preco_final)}</span>
+        <span class="oferta-preco-kg">/kg</span>
+      </div>`;
+    el.appendChild(li);
+  });
 
-    ofertas.forEach((item, idx) => {
-      const li = document.createElement('li');
-      li.className = 'oferta-item';
-      li.style.animationDelay = `${idx * 80}ms`;
-
-      const pct = item.preco_base > 0
-        ? Math.round((item.desconto / item.preco_base) * 100)
-        : 0;
-      const badgePct = pct > 0
-        ? `<span class="oferta-badge-pct">-${pct}%</span>`
-        : '';
-      const precoDeHTML = item.desconto > 0
-        ? `<span class="oferta-preco-de">${fmt(item.preco_base)}</span>`
-        : '';
-
-      li.innerHTML = `
-        <div class="oferta-top-row">
-          <span class="oferta-categoria">${item.categoria}</span>
-          ${badgePct}
-        </div>
-        <span class="oferta-nome">${item.nome}</span>
-        <div class="oferta-preco-row">
-          ${precoDeHTML}
-          <span class="oferta-preco-por">${fmt(item.preco_final)}</span>
-          <span class="oferta-preco-kg">/kg</span>
-        </div>
-      `;
-      el.appendChild(li);
-    });
-
-    el.classList.remove('atualizando');
-  }, 300);
+  iniciarCarrosselOfertas();
 }
 
-function renderizarSlide4(promocoes) {
-  const grid = document.getElementById('slide4-grid');
-  if (!grid) return;
+let v3OfertaIdx   = 0;
+let v3OfertaTimer = null;
 
-  grid.innerHTML = '';
+function iniciarCarrosselOfertas() {
+  clearInterval(v3OfertaTimer);
+  const itens = document.querySelectorAll('#lista-ofertas .oferta-item');
+  if (!itens.length) return;
 
-  if (!promocoes.length) {
-    grid.innerHTML = '<div class="slide4-vazio">Sem ofertas especiais hoje.<br>Consulte nossos atendentes!</div>';
+  v3OfertaIdx = 0;
+  aplicarOferta(itens, 0, false);
+
+  if (itens.length > 1) {
+    v3OfertaTimer = setInterval(() => {
+      v3OfertaIdx = (v3OfertaIdx + 1) % itens.length;
+      aplicarOferta(itens, v3OfertaIdx, true);
+    }, 4000);
+  }
+}
+
+function aplicarOferta(itens, idx, comFade) {
+  const item    = itens[idx];
+  const nome    = item.querySelector('.oferta-nome')?.textContent?.trim() || '';
+  const precoFn = item.querySelector('.oferta-preco-por')?.textContent?.trim() || '';
+  const precoDe = item.querySelector('.oferta-preco-de')?.textContent?.trim() || '';
+  const cat     = item.querySelector('.oferta-categoria')?.textContent?.trim() || '';
+
+  const infoEl  = document.querySelector('.s3-info');
+  const fotoEl  = document.getElementById('s3-foto-wrap');
+  const dotsEl  = document.getElementById('s3-dots');
+  const catEl   = document.getElementById('s3-categoria');
+  const nomeEl  = document.getElementById('s3-nome');
+  const deEl    = document.getElementById('s3-preco-de');
+  const reaisEl = document.getElementById('s3-reais');
+  const centsEl = document.getElementById('s3-cents');
+
+  if (!infoEl) return;
+
+  const aplicar = () => {
+    if (catEl)  catEl.textContent  = cat;
+    if (nomeEl) nomeEl.textContent = nome;
+    if (deEl) {
+      deEl.textContent   = precoDe ? 'De: ' + precoDe : '';
+      deEl.style.display = precoDe ? '' : 'none';
+    }
+    const limpo = precoFn.replace('R$', '').trim();
+    const m = limpo.match(/^(\d+)[,.](\d{2})/);
+    if (reaisEl) reaisEl.textContent = m ? m[1] : '—';
+    if (centsEl) centsEl.textContent = m ? ',' + m[2] : '';
+
+    if (dotsEl) {
+      if (itens.length <= 1) { dotsEl.style.display = 'none'; }
+      else {
+        dotsEl.style.display = 'flex';
+        dotsEl.innerHTML = '';
+        Array.from(itens).forEach((_, i) => {
+          const dot = document.createElement('span');
+          dot.className = 's3-dot' + (i === idx ? ' ativa' : '');
+          dotsEl.appendChild(dot);
+        });
+      }
+    }
+
+    if (fotoEl) {
+      Array.from(fotoEl.children).forEach(c => { if (!c.classList.contains('s3-foto-overlay')) c.remove(); });
+      const img = criarImgComFallback(nome, 'oferta-img');
+      fotoEl.insertBefore(img, fotoEl.firstChild);
+    }
+  };
+
+  if (!comFade) {
+    aplicar();
     return;
   }
 
-  promocoes.forEach(item => {
-    const pct = item.preco_base > 0
-      ? Math.round((item.desconto / item.preco_base) * 100)
-      : 0;
+  if (infoEl) { infoEl.style.transition = 'opacity 0.4s, transform 0.4s'; infoEl.style.opacity = '0'; infoEl.style.transform = 'translateX(20px)'; }
+  if (fotoEl) { fotoEl.style.transition = 'opacity 0.4s'; fotoEl.style.opacity = '0'; }
 
-    const card = document.createElement('div');
-    card.className = 'slide4-card';
-    card.innerHTML = `
-      <div class="slide4-card-top">
-        <span class="slide4-categoria">${item.categoria}</span>
-        ${pct > 0 ? `<span class="slide4-badge-pct">-${pct}%</span>` : ''}
-      </div>
-      <div class="slide4-nome">${item.nome}</div>
-      <div class="slide4-preco-de">${fmt(item.preco_base)}</div>
-      <div>
-        <span class="slide4-preco-final">${fmt(item.preco_final)}</span>
-        <span class="slide4-preco-kg">/kg</span>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-
-  const n    = promocoes.length;
-  const cols = n <= 2 ? n : n <= 4 ? 2 : 3;
-  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  setTimeout(() => {
+    aplicar();
+    if (infoEl) { infoEl.style.opacity = '1'; infoEl.style.transform = 'translateX(0)'; }
+    if (fotoEl) { fotoEl.style.opacity = '1'; }
+  }, 420);
 }
 
 /* ============================================================
-   SISTEMA DE SLIDES
+   SISTEMA DE SLIDES — baseado em IDs string
    ============================================================ */
-
-function getSlideList() {
-  return temPromocoes ? [0, 1, 2, 3, 4, 5, 6] : [0, 1, 3, 4, 5, 6];
+function getSlideElById(id) {
+  return slideEls.find(el => el.id === id) || null;
 }
 
 function atualizarDots() {
-  const lista = getSlideList();
-  const posAtual = lista.indexOf(currentSlideIdx);
-  const dots = document.querySelectorAll('.slide-dot');
-  dots.forEach((dot, i) => {
+  const posAtual = slideRotacao.indexOf(currentSlideId);
+  document.querySelectorAll('.slide-dot').forEach((dot, i) => {
     dot.classList.toggle('active', i === posAtual);
   });
 }
@@ -494,77 +537,54 @@ function renderDots() {
   const container = document.getElementById('slide-dots');
   if (!container) return;
   container.innerHTML = '';
-
-  getSlideList().forEach((slideIdx, pos) => {
+  slideRotacao.forEach((slideId, pos) => {
     const btn = document.createElement('button');
-    btn.className   = 'slide-dot' + (slideIdx === currentSlideIdx ? ' active' : '');
-    btn.title       = `Tela ${pos + 1}`;
+    btn.className = 'slide-dot' + (slideId === currentSlideId ? ' active' : '');
+    btn.title     = `Tela ${pos + 1}`;
     btn.setAttribute('aria-label', `Ir para tela ${pos + 1}`);
-    btn.addEventListener('click', () => goToSlide(slideIdx));
+    btn.addEventListener('click', () => goToSlide(slideId));
     container.appendChild(btn);
   });
 }
 
-function goToSlide(targetIdx) {
-  if (isTransitioning || targetIdx === currentSlideIdx) return;
+function goToSlide(targetId) {
+  if (isTransitioning || targetId === currentSlideId) return;
+  if (!slideRotacao.includes(targetId)) return;
 
   clearInterval(slideTimer);
   isTransitioning = true;
 
-  const prevEl  = slideEls[currentSlideIdx];
-  const nextEl  = slideEls[targetIdx];
-  const prevIdx = currentSlideIdx;
+  const prevEl = getSlideElById(currentSlideId);
+  const nextEl = getSlideElById(targetId);
+  if (!prevEl || !nextEl) { isTransitioning = false; return; }
 
+  const prevId = currentSlideId;
   nextEl.style.zIndex = '2';
   prevEl.style.zIndex = '1';
-
   nextEl.classList.add('active');
+  requestAnimationFrame(() => prevEl.classList.remove('active'));
 
-  requestAnimationFrame(() => {
-    prevEl.classList.remove('active');
-  });
-
-  currentSlideIdx = targetIdx;
+  currentSlideId = targetId;
   atualizarDots();
 
   setTimeout(() => {
     prevEl.style.zIndex = '';
     nextEl.style.zIndex = '';
-
-    if (pendingData[prevIdx]) {
-      renderSlide(prevIdx, pendingData[prevIdx]);
-      delete pendingData[prevIdx];
-    }
-
+    if (pendingRender) { pendingRender(); pendingRender = null; }
     isTransitioning = false;
     slideTimer = setInterval(avancarSlide, SLIDE_DURATION_MS);
   }, SLIDE_FADE_MS + 60);
 }
 
 function avancarSlide() {
-  const lista     = getSlideList();
-  const posAtual  = lista.indexOf(currentSlideIdx);
-
-  if (posAtual === -1) {
-    goToSlide(0);
-    return;
-  }
-
-  const proxPos = (posAtual + 1) % lista.length;
-  goToSlide(lista[proxPos]);
-}
-
-function iniciarSlides() {
-  slideEls = Array.from(document.querySelectorAll('.slide'));
-  slideEls.forEach((el, idx) => el.classList.toggle('active', idx === 0));
-  currentSlideIdx = 0;
-
-  renderDots();
-  slideTimer = setInterval(avancarSlide, SLIDE_DURATION_MS);
+  const posAtual = slideRotacao.indexOf(currentSlideId);
+  if (posAtual === -1) { goToSlide(slideRotacao[0]); return; }
+  const proxPos = (posAtual + 1) % slideRotacao.length;
+  goToSlide(slideRotacao[proxPos]);
 }
 
 /* ============================================================
-   FETCH DE DADOS
+   FETCH DE DADOS + REBUILD SLIDES
    ============================================================ */
 async function carregarDados() {
   await carregarFotos();
@@ -576,52 +596,49 @@ async function carregarDados() {
 
     const csv   = await resp.text();
     const itens = parsearCSV(csv);
-
     if (!itens.length) throw new Error('Nenhum item válido no CSV');
 
     const visiveis = itens.filter(i => i.visivel !== 'NÃO');
 
-    const bovinos    = visiveis.filter(i => i.categoria.toLowerCase() === 'bovinos');
-    const suinos     = visiveis.filter(i => i.categoria.toLowerCase() === 'suínos' || i.categoria.toLowerCase() === 'suinos');
-    const aves       = visiveis.filter(i => i.categoria.toLowerCase() === 'aves');
-    const miudos     = visiveis.filter(i => i.categoria.toLowerCase() === 'miúdos');
-    const frios      = visiveis.filter(i => i.categoria.toLowerCase() === 'frios');
-    const linguicas  = visiveis.filter(i => i.categoria.toLowerCase() === 'linguiças' || i.categoria.toLowerCase() === 'linguicas');
-    const espetos    = visiveis.filter(i => i.categoria.toLowerCase() === 'espetos');
-    const suinosAves = [...suinos, ...aves];
-    const promocoes  = visiveis.filter(i => i.promocao === 'SIM' && i.desconto > 0);
+    const dados = {};
+    CATEGORIAS_CONFIG.forEach(cfg => {
+      dados[cfg.key] = visiveis.filter(i =>
+        cfg.keys.some(k => i.categoria.toLowerCase() === k)
+      );
+    });
+    dados.promocoes = visiveis.filter(i => i.promocao === 'SIM' && i.desconto > 0);
 
-    const dados = { bovinos, suinos, aves, suinosAves, miudos, frios, linguicas, espetos, promocoes };
     dadosGlobais = dados;
-
     const promoAntes = temPromocoes;
-    temPromocoes = promocoes.length > 0;
+    temPromocoes = dados.promocoes.length > 0;
+
+    // Rebuild completo: reconstrói o DOM de slides e rerenderiza
+    const rebuild = () => {
+      clearInterval(slideTimer);
+      construirSlides(dados);
+      renderDots();
+      slideTimer = setInterval(avancarSlide, SLIDE_DURATION_MS);
+      carregouUmaVez = true;
+    };
 
     if (!carregouUmaVez) {
-      for (let i = 0; i < 7; i++) renderSlide(i, dados);
-      carregouUmaVez = true;
+      rebuild();
     } else {
-      for (let i = 0; i < 7; i++) {
-        if (i === currentSlideIdx) {
-          pendingData[i] = dados;
-        } else {
-          renderSlide(i, dados);
-        }
+      // Se está transitando, agenda para após; caso contrário, rebuilda agora
+      if (isTransitioning) {
+        pendingRender = rebuild;
+      } else {
+        rebuild();
       }
     }
 
-    if (promoAntes !== temPromocoes) renderDots();
-    // Slide de Oferta (índice 2 no DOM) só existe na lista quando temPromocoes; se saiu, volta ao 0
-    if (!temPromocoes && currentSlideIdx === 2) goToSlide(0);
-
     setStatus('ok', 'Sincronizado');
-
     const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const el   = document.getElementById('ultima-atualizacao');
     if (el) el.textContent = `Última atualização: ${hora}`;
 
   } catch (e) {
-    console.error('[Menu Digital] Erro ao carregar dados:', e);
+    console.error('[Menu Digital] Erro:', e);
     setStatus('err', 'Erro de conexão');
   }
 }
@@ -629,12 +646,11 @@ async function carregarDados() {
 /* ============================================================
    INICIALIZAÇÃO
    ============================================================ */
-iniciarSlides();
 carregarDados();
 setInterval(carregarDados, INTERVALO_MINUTOS * 60 * 1000);
 document.title = NOME_LOJA + ' – Cardápio Digital';
 
 console.info(
-  `%c🥩 ${NOME_LOJA} – Menu Digital v3 EXPANDIDO`,
+  `%c🥩 ${NOME_LOJA} – Menu Digital v3 DINÂMICO`,
   'font-size:16px;font-weight:bold;color:#e83030;'
 );

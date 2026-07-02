@@ -477,9 +477,11 @@ function getSlideList() {
 }
 
 function atualizarDots() {
+  const lista = getSlideList();
+  const posAtual = lista.indexOf(currentSlideIdx);
   const dots = document.querySelectorAll('.slide-dot');
   dots.forEach((dot, i) => {
-    dot.classList.toggle('active', i === currentSlideIdx);
+    dot.classList.toggle('active', i === posAtual);
   });
 }
 
@@ -604,6 +606,7 @@ async function carregarDados() {
     }
 
     if (promoAntes !== temPromocoes) renderDots();
+    // Slide de Oferta (índice 2 no DOM) só existe na lista quando temPromocoes; se saiu, volta ao 0
     if (!temPromocoes && currentSlideIdx === 2) goToSlide(0);
 
     setStatus('ok', 'Sincronizado');

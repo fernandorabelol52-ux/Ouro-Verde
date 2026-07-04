@@ -787,12 +787,21 @@ html, body {
   overflow: hidden;
 }
 
-.s-duplo-colunas {
+/* Área abaixo do header: foto | divisor | coluna A | divisor | coluna B */
+.s-duplo-corpo {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 3px 1fr;
+  grid-template-columns: 160px 3px 1fr 3px 1fr;
   overflow: hidden;
   min-height: 0;
+}
+
+.s-duplo-foto {
+  background: var(--bg);
+  border-right: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .s-duplo-col {

@@ -444,8 +444,8 @@ html, body {
 .sp-grid-v3 .sp-card {
   display: flex;
   align-items: center;
-  padding: 5px 14px;
-  gap: 6px;
+  padding: 7px 16px;
+  gap: 8px;
   border-bottom: 1px solid var(--brd);
   flex-shrink: 0;
 }
@@ -457,7 +457,7 @@ html, body {
 
 .sp-grid-v3 .sp-card-nome {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--txt);
   text-transform: uppercase;
@@ -469,7 +469,7 @@ html, body {
 }
 
 .sp-grid-v3 .sp-card-preco-de {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--txt2);
   text-decoration: line-through;
   flex-shrink: 0;
@@ -478,19 +478,19 @@ html, body {
 
 .sp-grid-v3 .sp-card-preco {
   font-family: var(--font-disp);
-  font-size: 21px;
+  font-size: 26px;
   color: var(--txt);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .sp-grid-v3 .sp-card-kg {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--txt2);
   flex-shrink: 0;
   align-self: flex-end;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .sp-grid-v3 .sp-card:has(.sp-card-preco-de) .sp-card-nome  { color: var(--vm); }

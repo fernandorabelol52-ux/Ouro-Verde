@@ -797,7 +797,8 @@ html, body {
 }
 
 .s-duplo-foto {
-  background: var(--bg);
+  background: var(--bg2);
+  border-right: 3px solid var(--ou);
   display: flex;
   flex-direction: column;
   overflow: hidden;

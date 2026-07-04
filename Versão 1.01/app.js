@@ -275,7 +275,7 @@ function construirSlides(dados) {
       slideEl.id        = slideId;
 
       if (usaDuasColunas) {
-        // Layout de 2 colunas — header único cobrindo a largura toda
+        // Layout de 2 colunas — header único, sem fotos
         slideEl.innerHTML = `
           <div class="s-duplo-layout">
             <div class="cat-hdr ${cfg.cor}">
@@ -284,12 +284,10 @@ function construirSlides(dados) {
             </div>
             <div class="s-duplo-colunas">
               <div class="s-duplo-col">
-                <div class="s-duplo-fotos" id="fotos-${slideId}-a"></div>
                 <div id="grid-${slideId}-a" class="sp-grid-v3"></div>
               </div>
               <div class="s2-divider"></div>
               <div class="s-duplo-col">
-                <div class="s-duplo-fotos" id="fotos-${slideId}-b"></div>
                 <div id="grid-${slideId}-b" class="sp-grid-v3"></div>
               </div>
             </div>
@@ -297,8 +295,6 @@ function construirSlides(dados) {
 
         preencherGrid(slideEl.querySelector(`#grid-${slideId}-a`), colunaA);
         preencherGrid(slideEl.querySelector(`#grid-${slideId}-b`), colunaB);
-        injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}-a`), cfg.key, colunaA.map(i => i.nome), 2);
-        injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}-b`), cfg.key, colunaB.map(i => i.nome), 2);
 
       } else {
         // Layout de 1 coluna

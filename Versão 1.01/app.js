@@ -298,8 +298,8 @@ function construirSlides(dados) {
             </div>
           </div>`;
 
-        preencherGrid(`grid-${slideId}-a`, colunaA);
-        preencherGrid(`grid-${slideId}-b`, colunaB);
+        preencherGrid(slideEl.querySelector(`#grid-${slideId}-a`), colunaA);
+        preencherGrid(slideEl.querySelector(`#grid-${slideId}-b`), colunaB);
         injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}-a`), cfg.key, colunaA.map(i => i.nome), 2);
         injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}-b`), cfg.key, colunaB.map(i => i.nome), 2);
 
@@ -317,7 +317,7 @@ function construirSlides(dados) {
             </div>
           </div>`;
 
-        preencherGrid(`grid-${slideId}`, paginaItens);
+        preencherGrid(slideEl.querySelector(`#grid-${slideId}`), paginaItens);
         injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}`), cfg.key, paginaItens.map(i => i.nome), 3);
       }
 
@@ -376,8 +376,8 @@ function construirSlides(dados) {
 /* ============================================================
    PREENCHE UM GRID COM ITENS
    ============================================================ */
-function preencherGrid(gridId, itens) {
-  const grid = document.getElementById(gridId);
+function preencherGrid(gridOrId, itens) {
+  const grid = typeof gridOrId === 'string' ? document.getElementById(gridOrId) : gridOrId;
   if (!grid) return;
   grid.innerHTML = '';
 

@@ -275,27 +275,21 @@ function construirSlides(dados) {
       slideEl.id        = slideId;
 
       if (usaDuasColunas) {
-        // Layout de 2 colunas
+        // Layout de 2 colunas — header único cobrindo a largura toda
         slideEl.innerHTML = `
-          <div class="s2-layout">
-            <div class="s2-half">
-              <div class="cat-hdr ${cfg.cor}">
-                <span class="cat-tit">${titulo}</span>
-                <span class="cat-sub">${cfg.sub}</span>
-              </div>
-              <div class="s2-content">
-                <div class="s2-fotos" id="fotos-${slideId}-a"></div>
+          <div class="s-duplo-layout">
+            <div class="cat-hdr ${cfg.cor}">
+              <span class="cat-tit">${titulo}</span>
+              <span class="cat-sub">${cfg.sub}</span>
+            </div>
+            <div class="s-duplo-colunas">
+              <div class="s-duplo-col">
+                <div class="s-duplo-fotos" id="fotos-${slideId}-a"></div>
                 <div id="grid-${slideId}-a" class="sp-grid-v3"></div>
               </div>
-            </div>
-            <div class="s2-divider"></div>
-            <div class="s2-half">
-              <div class="cat-hdr ${cfg.cor}">
-                <span class="cat-tit">${titulo}</span>
-                <span class="cat-sub">${cfg.sub}</span>
-              </div>
-              <div class="s2-content">
-                <div class="s2-fotos" id="fotos-${slideId}-b"></div>
+              <div class="s2-divider"></div>
+              <div class="s-duplo-col">
+                <div class="s-duplo-fotos" id="fotos-${slideId}-b"></div>
                 <div id="grid-${slideId}-b" class="sp-grid-v3"></div>
               </div>
             </div>

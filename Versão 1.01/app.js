@@ -23,8 +23,11 @@ const NOME_LOJA          = 'Açougue Ouro Verde';
 const SLIDE_DURATION_MS  = 12000;
 const SLIDE_FADE_MS      = 800;
 
-// Máximo de itens visíveis por coluna (TV 1080px, header 68, footer 44, cat-hdr ~46, col-hdr ~24 = ~898px úteis, cada row ~32px)
-const ITENS_POR_COLUNA = 26;
+// Máximo de itens visíveis por coluna
+// TV 1080px − header 68 − footer 44 − cat-hdr 46 = ~922px úteis
+// Cada sp-card com font 18px: padding 7×2 + borda 1 + linha ≈ 43px → ~21 itens
+// Usamos 20 para folga segura
+const ITENS_POR_COLUNA = 20;
 
 /* ============================================================
    ESTADO GLOBAL
@@ -298,8 +301,8 @@ function construirSlides(dados) {
             </div>
           </div>`;
 
-        preencherGrid(slideEl.querySelector(`#grid-${slideId}-a`), colunaA);
-        preencherGrid(slideEl.querySelector(`#grid-${slideId}-b`), colunaB);
+        preencherGrid(`grid-${slideId}-a`, colunaA);
+        preencherGrid(`grid-${slideId}-b`, colunaB);
         injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}-a`), cfg.key, colunaA.map(i => i.nome), 2);
         injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}-b`), cfg.key, colunaB.map(i => i.nome), 2);
 
@@ -317,7 +320,7 @@ function construirSlides(dados) {
             </div>
           </div>`;
 
-        preencherGrid(slideEl.querySelector(`#grid-${slideId}`), paginaItens);
+        preencherGrid(`grid-${slideId}`, paginaItens);
         injetarFotosColuna(slideEl.querySelector(`#fotos-${slideId}`), cfg.key, paginaItens.map(i => i.nome), 3);
       }
 
@@ -376,8 +379,8 @@ function construirSlides(dados) {
 /* ============================================================
    PREENCHE UM GRID COM ITENS
    ============================================================ */
-function preencherGrid(gridOrId, itens) {
-  const grid = typeof gridOrId === 'string' ? document.getElementById(gridOrId) : gridOrId;
+function preencherGrid(gridId, itens) {
+  const grid = document.getElementById(gridId);
   if (!grid) return;
   grid.innerHTML = '';
 

@@ -275,7 +275,7 @@ function construirSlides(dados) {
       slideEl.id        = slideId;
 
       if (usaDuasColunas) {
-        // Layout de 2 colunas — foto à esquerda, duas listas à direita
+        // Layout de 2 colunas — foto esquerda, header único, duas listas direita
         slideEl.innerHTML = `
           <div class="s-duplo-layout">
             <div class="cat-hdr ${cfg.cor}">

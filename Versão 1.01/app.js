@@ -174,6 +174,22 @@ function injetarFotosColuna(colEl, categoriaKey, nomes, maxItens = 2) {
   }
 
   const nomesValidos = (nomes || []).filter(Boolean).slice(0, maxItens);
+
+  if (!nomesValidos.length) {
+    // Sem itens: mostra logo cobrindo toda a coluna
+    const wrap = document.createElement('div');
+    wrap.className = 'foto-cell';
+    const img = document.createElement('img');
+    img.src = FOTO_FALLBACK;
+    img.className = 'foto-corte';
+    img.alt = 'Açougue Ouro Verde';
+    img.style.objectFit = 'contain';
+    img.style.padding = '12px';
+    wrap.appendChild(img);
+    colEl.appendChild(wrap);
+    return;
+  }
+
   nomesValidos.forEach(nome => {
     const wrap = document.createElement('div');
     wrap.className = 'foto-cell';

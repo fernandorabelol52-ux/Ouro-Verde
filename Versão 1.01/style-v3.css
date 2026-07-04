@@ -787,7 +787,7 @@ html, body {
   overflow: hidden;
 }
 
-/* Área abaixo do header: foto | divisor | coluna A | divisor | coluna B */
+/* foto | divisor | col A | divisor | col B */
 .s-duplo-corpo {
   flex: 1;
   display: grid;
@@ -798,7 +798,6 @@ html, body {
 
 .s-duplo-foto {
   background: var(--bg);
-  border-right: none;
   display: flex;
   flex-direction: column;
   overflow: hidden;

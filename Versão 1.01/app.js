@@ -232,9 +232,16 @@ function parsearCSV(csv) {
     const nome        = (p[1] || '').replace(/"/g, '').trim();
     const preco_base  = parseFloat((p[2] || '0').replace(/[R$\s]/g, '').replace(',', '.')) || 0;
     const desconto    = parseFloat((p[3] || '0').replace(/[R$\s]/g, '').replace(',', '.')) || 0;
-    const preco_final = parseFloat((p[4] || '0').replace(/[R$\s]/g, '').replace(',', '.')) || preco_base;
-    const promocao    = (p[5] || 'NÃO').replace(/"/g, '').trim().toUpperCase();
-    const visivel     = (p[6] || 'SIM').replace(/"/g, '').trim().toUpperCase();
+    const promocao    = (p[5] || 'NAO').replace(/"/g, '').trim().toUpperCase()
+                          .normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // remove acentos: NÃO → NAO
+    // Preço final: calcula automaticamente se for promoção (não depende da coluna E)
+    const preco_final = (promocao === 'SIM' && desconto > 0)
+      ? Math.round((preco_base - desconto) * 100) / 100
+      : parseFloat((p[4] || '0').replace(/[R$\s]/g, '').replace(',', '.')) || preco_base;
+    // Visível: aceita NAO, NÃO, Não, não (remove acento antes de comparar)
+    const visivelRaw  = (p[6] || 'SIM').replace(/"/g, '').trim().toUpperCase()
+                          .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const visivel     = visivelRaw;
     if (!nome) continue;
     itens.push({ categoria, nome, preco_base, desconto, preco_final, promocao, visivel });
   }
@@ -340,39 +347,63 @@ function construirSlides(dados) {
     });
   });
 
-  // ── Slide de Oferta do Dia (só aparece se houver promoções) ─
+  // ── Slides de Oferta do Dia (sem foto — 2 promoções por tela) ─
   if (temPromocoes) {
-    const slideOferta = document.createElement('div');
-    slideOferta.className = 'slide';
-    slideOferta.id        = 'slide-oferta';
-    slideOferta.innerHTML = `
-      <div class="s3-layout">
-        <div class="s3-foto-wrap" id="s3-foto-wrap">
-          <div class="s3-foto-overlay"></div>
-        </div>
-        <div class="s3-info">
-          <div class="s3-label">OFERTA ESPECIAL DO DIA</div>
-          <div class="s3-dots" id="s3-dots"></div>
-          <div class="s3-categoria" id="s3-categoria"></div>
-          <div class="s3-nome" id="s3-nome"></div>
-          <div class="s3-linha"></div>
-          <div class="s3-preco-de" id="s3-preco-de"></div>
-          <div class="of-badge">
-            <span class="of-rs">R$</span>
-            <span class="of-reais" id="s3-reais">—</span>
-            <span class="of-cents" id="s3-cents"></span>
-            <span class="of-kg">/kg</span>
+    const PROMOS_POR_SLIDE = 2;
+    const promocoes = dados.promocoes;
+    const totalPags = Math.ceil(promocoes.length / PROMOS_POR_SLIDE);
+
+    for (let p = 0; p < totalPags; p++) {
+      const lote     = promocoes.slice(p * PROMOS_POR_SLIDE, (p + 1) * PROMOS_POR_SLIDE);
+      const slideId  = totalPags > 1 ? `slide-oferta-${p}` : 'slide-oferta';
+      const slideEl  = document.createElement('div');
+      slideEl.className = 'slide';
+      slideEl.id        = slideId;
+
+      const cardsHTML = lote.map(item => {
+        const unidade  = getUnidade(item.categoria);
+        const pct      = item.preco_base > 0
+          ? Math.round((item.desconto / item.preco_base) * 100) : 0;
+        const pctBadge = pct > 0 ? `<span class="ofv2-pct">-${pct}%</span>` : '';
+        return `
+          <div class="ofv2-card">
+            <div class="ofv2-topo">
+              <span class="ofv2-categoria">${item.categoria.toUpperCase()}</span>
+              ${pctBadge}
+            </div>
+            <div class="ofv2-nome">${item.nome}</div>
+            <div class="ofv2-preco-linha">
+              ${item.desconto > 0 ? `<span class="ofv2-de">${fmt(item.preco_base)}</span>` : ''}
+              <span class="ofv2-por">${fmt(item.preco_final)}</span>
+              <span class="ofv2-un">${unidade}</span>
+            </div>
+            <div class="ofv2-validade">Oferta válida somente hoje</div>
+          </div>`;
+      }).join('');
+
+      const paginaLabel = totalPags > 1
+        ? `<span class="ofv2-pag">${p + 1} / ${totalPags}</span>` : '';
+
+      slideEl.innerHTML = `
+        <div class="ofv2-layout">
+          <div class="ofv2-header">
+            <span class="ofv2-titulo">🏷️ OFERTAS DO DIA</span>
+            ${paginaLabel}
           </div>
-          <div class="s3-validade">Oferta válida somente hoje</div>
-        </div>
-      </div>`;
-    wrapper.appendChild(slideOferta);
-    slideEls.push(slideOferta);
-    slideRotacao.push('slide-oferta');
+          <div class="ofv2-grid ofv2-grid-${lote.length}">
+            ${cardsHTML}
+          </div>
+        </div>`;
+
+      wrapper.appendChild(slideEl);
+      slideEls.push(slideEl);
+      slideRotacao.push(slideId);
+    }
   }
 
-  // ── Renderizar ofertas na lista oculta (carrossel) ──────────
-  renderizarOfertas(dados.promocoes);
+  // lista-ofertas mantida apenas para compatibilidade (carrossel antigo removido)
+  const listaOfertas = document.getElementById('lista-ofertas');
+  if (listaOfertas) listaOfertas.innerHTML = '';
 
   // ── Ativar primeiro slide ───────────────────────────────────
   if (slideEls.length) {
@@ -418,118 +449,8 @@ function preencherGrid(gridOrId, itens) {
 }
 
 /* ============================================================
-   CARROSSEL DE OFERTA DO DIA
+   CARROSSEL DE OFERTA — removido (v2: slides diretos sem foto)
    ============================================================ */
-function renderizarOfertas(ofertas) {
-  const el = document.getElementById('lista-ofertas');
-  if (!el) return;
-  el.innerHTML = '';
-  if (!ofertas.length) return;
-
-  ofertas.forEach((item, i) => {
-    const pct = item.preco_base > 0 ? Math.round((item.desconto / item.preco_base) * 100) : 0;
-    const li  = document.createElement('li');
-    li.className = 'oferta-item';
-    li.innerHTML = `
-      <div class="oferta-top-row">
-        <span class="oferta-categoria">${item.categoria}</span>
-        ${pct > 0 ? `<span class="oferta-badge-pct">-${pct}%</span>` : ''}
-      </div>
-      <span class="oferta-nome">${item.nome}</span>
-      <div class="oferta-preco-row">
-        ${item.desconto > 0 ? `<span class="oferta-preco-de">${fmt(item.preco_base)}</span>` : ''}
-        <span class="oferta-preco-por">${fmt(item.preco_final)}</span>
-        <span class="oferta-preco-kg">/kg</span>
-      </div>`;
-    el.appendChild(li);
-  });
-
-  iniciarCarrosselOfertas();
-}
-
-let v3OfertaIdx   = 0;
-let v3OfertaTimer = null;
-
-function iniciarCarrosselOfertas() {
-  clearInterval(v3OfertaTimer);
-  const itens = document.querySelectorAll('#lista-ofertas .oferta-item');
-  if (!itens.length) return;
-
-  v3OfertaIdx = 0;
-  aplicarOferta(itens, 0, false);
-
-  if (itens.length > 1) {
-    v3OfertaTimer = setInterval(() => {
-      v3OfertaIdx = (v3OfertaIdx + 1) % itens.length;
-      aplicarOferta(itens, v3OfertaIdx, true);
-    }, 4000);
-  }
-}
-
-function aplicarOferta(itens, idx, comFade) {
-  const item    = itens[idx];
-  const nome    = item.querySelector('.oferta-nome')?.textContent?.trim() || '';
-  const precoFn = item.querySelector('.oferta-preco-por')?.textContent?.trim() || '';
-  const precoDe = item.querySelector('.oferta-preco-de')?.textContent?.trim() || '';
-  const cat     = item.querySelector('.oferta-categoria')?.textContent?.trim() || '';
-
-  const infoEl  = document.querySelector('.s3-info');
-  const fotoEl  = document.getElementById('s3-foto-wrap');
-  const dotsEl  = document.getElementById('s3-dots');
-  const catEl   = document.getElementById('s3-categoria');
-  const nomeEl  = document.getElementById('s3-nome');
-  const deEl    = document.getElementById('s3-preco-de');
-  const reaisEl = document.getElementById('s3-reais');
-  const centsEl = document.getElementById('s3-cents');
-
-  if (!infoEl) return;
-
-  const aplicar = () => {
-    if (catEl)  catEl.textContent  = cat;
-    if (nomeEl) nomeEl.textContent = nome;
-    if (deEl) {
-      deEl.textContent   = precoDe ? 'De: ' + precoDe : '';
-      deEl.style.display = precoDe ? '' : 'none';
-    }
-    const limpo = precoFn.replace('R$', '').trim();
-    const m = limpo.match(/^(\d+)[,.](\d{2})/);
-    if (reaisEl) reaisEl.textContent = m ? m[1] : '—';
-    if (centsEl) centsEl.textContent = m ? ',' + m[2] : '';
-
-    if (dotsEl) {
-      if (itens.length <= 1) { dotsEl.style.display = 'none'; }
-      else {
-        dotsEl.style.display = 'flex';
-        dotsEl.innerHTML = '';
-        Array.from(itens).forEach((_, i) => {
-          const dot = document.createElement('span');
-          dot.className = 's3-dot' + (i === idx ? ' ativa' : '');
-          dotsEl.appendChild(dot);
-        });
-      }
-    }
-
-    if (fotoEl) {
-      Array.from(fotoEl.children).forEach(c => { if (!c.classList.contains('s3-foto-overlay')) c.remove(); });
-      const img = criarImgComFallback(nome, 'oferta-img');
-      fotoEl.insertBefore(img, fotoEl.firstChild);
-    }
-  };
-
-  if (!comFade) {
-    aplicar();
-    return;
-  }
-
-  if (infoEl) { infoEl.style.transition = 'opacity 0.4s, transform 0.4s'; infoEl.style.opacity = '0'; infoEl.style.transform = 'translateX(20px)'; }
-  if (fotoEl) { fotoEl.style.transition = 'opacity 0.4s'; fotoEl.style.opacity = '0'; }
-
-  setTimeout(() => {
-    aplicar();
-    if (infoEl) { infoEl.style.opacity = '1'; infoEl.style.transform = 'translateX(0)'; }
-    if (fotoEl) { fotoEl.style.opacity = '1'; }
-  }, 420);
-}
 
 /* ============================================================
    SISTEMA DE SLIDES — baseado em IDs string
@@ -610,7 +531,7 @@ async function carregarDados() {
     const itens = parsearCSV(csv);
     if (!itens.length) throw new Error('Nenhum item válido no CSV');
 
-    const visiveis = itens.filter(i => i.visivel !== 'NÃO');
+    const visiveis = itens.filter(i => i.visivel !== 'NAO');
 
     const dados = {};
     CATEGORIAS_CONFIG.forEach(cfg => {

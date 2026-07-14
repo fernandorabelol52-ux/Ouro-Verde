@@ -810,3 +810,160 @@ html, body {
   overflow: hidden;
   min-height: 0;
 }
+
+/* ====================================================
+   SLIDE OFERTA V2 — sem foto, 2 cards por tela
+   ==================================================== */
+.ofv2-layout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.ofv2-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 40px 12px;
+  background: var(--vm);
+  border-bottom: 4px solid var(--ou);
+  flex-shrink: 0;
+}
+
+.ofv2-titulo {
+  font-family: var(--font-disp);
+  font-size: 30px;
+  letter-spacing: 5px;
+  color: #fff;
+  line-height: 1;
+}
+
+.ofv2-pag {
+  font-family: var(--font-disp);
+  font-size: 18px;
+  color: var(--ou);
+  letter-spacing: 2px;
+}
+
+/* Grid: 1 ou 2 cards lado a lado */
+.ofv2-grid {
+  flex: 1;
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.ofv2-grid-1 {
+  grid-template-columns: 1fr;
+}
+
+.ofv2-grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Cada card de promoção */
+.ofv2-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 60px;
+  gap: 18px;
+  border-right: 3px solid var(--brd2);
+  border-bottom: none;
+  background: var(--bg);
+}
+
+.ofv2-card:last-child {
+  border-right: none;
+}
+
+.ofv2-grid-1 .ofv2-card {
+  padding: 60px 120px;
+}
+
+.ofv2-topo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ofv2-categoria {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--txt2);
+  text-transform: uppercase;
+}
+
+.ofv2-pct {
+  background: var(--vm);
+  color: #fff;
+  font-family: var(--font-disp);
+  font-size: 20px;
+  letter-spacing: 2px;
+  padding: 4px 14px;
+  border-radius: 6px;
+  border: 2px solid var(--ou);
+}
+
+.ofv2-nome {
+  font-family: var(--font-disp);
+  font-size: 72px;
+  letter-spacing: 3px;
+  color: var(--txt);
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.ofv2-grid-1 .ofv2-nome {
+  font-size: 96px;
+}
+
+.ofv2-preco-linha {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.ofv2-de {
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--txt2);
+  text-decoration: line-through;
+}
+
+.ofv2-por {
+  font-family: var(--font-disp);
+  font-size: 80px;
+  color: var(--vm);
+  line-height: 1;
+}
+
+.ofv2-grid-1 .ofv2-por {
+  font-size: 108px;
+}
+
+.ofv2-un {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--txt2);
+  align-self: flex-end;
+  margin-bottom: 10px;
+}
+
+.ofv2-validade {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--txt2);
+}

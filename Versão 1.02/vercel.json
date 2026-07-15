@@ -1,12 +1,3 @@
 {
-  "rewrites": [
-    {
-      "source": "/sem-promo",
-      "destination": "/index-sem-promo.html"
-    },
-    {
-      "source": "/",
-      "destination": "/index.html"
-    }
-  ]
+  "cleanUrls": true
 }

@@ -1,40 +1,7 @@
 {
   "versao": "2026-07-21T00:00:00.000Z",
   "fallback": "logo.png",
-  "itens": {
-    "Filé Mignon": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/file-mignon.png",
-      "alt": "Filé Mignon — Açougue Ouro Verde"
-    },
-    "Picanha": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/picanha.jpeg",
-      "alt": "Picanha — Açougue Ouro Verde"
-    },
-    "Maminha": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/maminha.jpeg",
-      "alt": "Maminha — Açougue Ouro Verde"
-    },
-    "Miolo da Alcatra": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/alcatra.jpeg",
-      "alt": "Miolo da Alcatra — Açougue Ouro Verde"
-    },
-    "Contra Filé": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/contra-file.jpeg",
-      "alt": "Contra Filé — Açougue Ouro Verde"
-    },
-    "Sobre Coxa Resfriada": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/sobrecoxa.png",
-      "alt": "Sobre Coxa Resfriada — Açougue Ouro Verde"
-    },
-    "Filé de Peito s/ osso": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/peito-de-frango.jpeg",
-      "alt": "Filé de Peito s/ osso — Açougue Ouro Verde"
-    },
-    "Bisteca Carre": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/bisteca-suina.jpeg",
-      "alt": "Bisteca Carre — Açougue Ouro Verde"
-    }
-  },
+  "itens": {},
   "categorias": {
     "Bovinos": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.01/imagens/cat-bovinos.png",

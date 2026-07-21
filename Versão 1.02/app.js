@@ -117,7 +117,7 @@ async function carregarFotos() {
     FOTO_FALLBACK = dados.fallback || 'logo.png';
     CATEGORIAS_MAP = {};
     for (const [k, v] of Object.entries(dados.categorias || {})) {
-      const kNorm = k.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const kNorm = k.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
       CATEGORIAS_MAP[kNorm] = v;
     }
     console.info('[Fotos] Carregadas:', Object.keys(FOTOS_MAP).length);
@@ -134,7 +134,7 @@ function getFoto(nomeCorte) {
 }
 
 function getFotoCategoria(categoria) {
-  const k = (categoria || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const k = (categoria || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   const entrada = CATEGORIAS_MAP[k];
   if (!entrada || !entrada.foto) return null;
   return { foto: entrada.foto, position: entrada.position || '50% 50%' };

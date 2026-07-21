@@ -1,11 +1,7 @@
 {
-  "versao": "2026-07-04T14:59:58.323Z",
+  "versao": "2026-07-21T00:00:00.000Z",
   "fallback": "logo.png",
   "itens": {
-    "Sobrecoxa": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/sobrecoxa.png",
-      "alt": "Sobrecoxa — Açougue Ouro Verde"
-    },
     "Filé Mignon": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/file-mignon.png",
       "alt": "Filé Mignon — Açougue Ouro Verde"
@@ -14,25 +10,29 @@
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/picanha.jpeg",
       "alt": "Picanha — Açougue Ouro Verde"
     },
-    "Alcatra": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/alcatra.jpeg",
-      "alt": "Alcatra — Açougue Ouro Verde"
-    },
     "Maminha": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/maminha.jpeg",
       "alt": "Maminha — Açougue Ouro Verde"
     },
-    "Peito de Frango": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/peito-de-frango.jpeg",
-      "alt": "Peito de Frango — Açougue Ouro Verde"
+    "Miolo da Alcatra": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/imagens/alcatra.jpeg",
+      "alt": "Miolo da Alcatra — Açougue Ouro Verde"
     },
-    "Contra-filé": {
+    "Contra Filé": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/contra-file.jpeg",
-      "alt": "Contra-filé — Açougue Ouro Verde"
+      "alt": "Contra Filé — Açougue Ouro Verde"
     },
-    "Bisteca Suina": {
+    "Sobre Coxa Resfriada": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/sobrecoxa.png",
+      "alt": "Sobre Coxa Resfriada — Açougue Ouro Verde"
+    },
+    "Filé de Peito s/ osso": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/peito-de-frango.jpeg",
+      "alt": "Filé de Peito s/ osso — Açougue Ouro Verde"
+    },
+    "Bisteca Carre": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.0/imagens/bisteca-suina.jpeg",
-      "alt": "Bisteca Suina — Açougue Ouro Verde"
+      "alt": "Bisteca Carre — Açougue Ouro Verde"
     }
   },
   "categorias": {

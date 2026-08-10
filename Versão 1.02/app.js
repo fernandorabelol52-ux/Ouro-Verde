@@ -38,6 +38,7 @@ const ITENS_POR_COLUNA = 20;
    ============================================================ */
 let dadosGlobais   = null;
 let temPromocoes   = false;
+let temNaoVisiveis = false;
 let carregouUmaVez = false;
 
 // Sistema de slides — dinâmico
@@ -405,6 +406,54 @@ function construirSlides(dados) {
     }
   }
 
+
+  // ── Slide de Itens Indisponíveis (visível = NÃO) ─────────────
+  if (temNaoVisiveis) {
+    const INDISP_POR_SLIDE = 16; // 2 colunas de até 8 itens cada
+    const naoVis    = dados.naoVisiveis;
+    const totalPags = Math.ceil(naoVis.length / INDISP_POR_SLIDE);
+
+    for (let p = 0; p < totalPags; p++) {
+      const lote    = naoVis.slice(p * INDISP_POR_SLIDE, (p + 1) * INDISP_POR_SLIDE);
+      const slideId = totalPags > 1 ? `slide-indisponivel-${p}` : 'slide-indisponivel';
+      const slideEl = document.createElement('div');
+      slideEl.className = 'slide';
+      slideEl.id        = slideId;
+
+      const metade  = Math.ceil(lote.length / 2);
+      const colA    = lote.slice(0, metade);
+      const colB    = lote.slice(metade);
+
+      const renderCol = (arr) => arr.map(item => {
+        const unidade = getUnidade(item.categoria);
+        return `<div class="indis-row">
+          <span class="indis-cat">${item.categoria.toUpperCase()}</span>
+          <span class="indis-nome">${item.nome}</span>
+          <span class="indis-badge">INDISPONÍVEL</span>
+        </div>`;
+      }).join('');
+
+      const paginaLabel = totalPags > 1
+        ? `<span class="indis-pag">${p + 1} / ${totalPags}</span>` : '';
+
+      slideEl.innerHTML = `
+        <div class="indis-layout">
+          <div class="indis-header">
+            <span class="indis-titulo">⏳ TEMPORARIAMENTE INDISPONÍVEL</span>
+            ${paginaLabel}
+          </div>
+          <div class="indis-corpo">
+            <div class="indis-col">${renderCol(colA)}</div>
+            ${colB.length ? `<div class="indis-divider"></div><div class="indis-col">${renderCol(colB)}</div>` : ''}
+          </div>
+        </div>`;
+
+      wrapper.appendChild(slideEl);
+      slideEls.push(slideEl);
+      slideRotacao.push(slideId);
+    }
+  }
+
   // lista-ofertas mantida apenas para compatibilidade (carrossel antigo removido)
   const listaOfertas = document.getElementById('lista-ofertas');
   if (listaOfertas) listaOfertas.innerHTML = '';
@@ -535,7 +584,8 @@ async function carregarDados() {
     const itens = parsearCSV(csv);
     if (!itens.length) throw new Error('Nenhum item válido no CSV');
 
-    const visiveis = itens.filter(i => i.visivel !== 'NAO');
+    const visiveis    = itens.filter(i => i.visivel !== 'NAO');
+    const naoVisiveis = itens.filter(i => i.visivel === 'NAO');
 
     const dados = {};
     CATEGORIAS_CONFIG.forEach(cfg => {
@@ -543,11 +593,14 @@ async function carregarDados() {
         cfg.keys.some(k => i.categoria.toLowerCase() === k)
       );
     });
-    dados.promocoes = visiveis.filter(i => i.promocao === 'SIM' && i.desconto > 0);
+    dados.promocoes   = visiveis.filter(i => i.promocao === 'SIM' && i.desconto > 0);
+    dados.naoVisiveis = naoVisiveis;
 
     dadosGlobais = dados;
-    const promoAntes = temPromocoes;
-    temPromocoes = !MODO_SEM_PROMO && dados.promocoes.length > 0;
+    const promoAntes       = temPromocoes;
+    const naoVisAnt        = temNaoVisiveis;
+    temPromocoes   = !MODO_SEM_PROMO && dados.promocoes.length > 0;
+    temNaoVisiveis = !MODO_SEM_PROMO && dados.naoVisiveis.length > 0;
 
     // Rebuild completo: reconstrói o DOM de slides e rerenderiza
     const rebuild = () => {
@@ -591,3 +644,5 @@ console.info(
   `%c🥩 ${NOME_LOJA} – Menu Digital v3 DINÂMICO`,
   'font-size:16px;font-weight:bold;color:#e83030;'
 );
+
+

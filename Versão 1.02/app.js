@@ -31,7 +31,7 @@ const SLIDE_FADE_MS      = 800;
 // TV 1080px − header 68 − footer 44 − cat-hdr 46 = ~922px úteis
 // Cada sp-card com font 18px: padding 7×2 + borda 1 + linha ≈ 43px → ~21 itens
 // Usamos 20 para folga segura
-const ITENS_POR_COLUNA = 18;
+const ITENS_POR_COLUNA = 16;
 
 /* ============================================================
    ESTADO GLOBAL

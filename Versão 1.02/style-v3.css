@@ -398,39 +398,10 @@ html, body {
 }
 
 /* ====================================================
-   SLIDE 1 — SUÍNOS & AVES
+   DIVISOR DOURADO (usado no layout duplo)
    ==================================================== */
-.s2-layout {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: 1fr 3px 1fr;
-}
-
 .s2-divider {
   background: var(--ou);
-}
-
-.s2-half {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.s2-content {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  overflow: hidden;
-  min-height: 0;
-}
-
-.s2-fotos {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--bg);
-  border-right: 2px solid var(--brd2);
 }
 
 /* sp-grid-v3: compact list for suinos/aves */

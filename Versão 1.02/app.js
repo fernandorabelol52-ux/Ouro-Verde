@@ -533,7 +533,7 @@ async function carregarDados() {
     const itens = parsearCSV(csv);
     if (!itens.length) throw new Error('Nenhum item válido no CSV');
 
-    const visiveis = itens.filter(i => i.visivel !== 'NAO');
+    const visiveis    = itens.filter(i => i.visivel !== 'NAO');
 
     const dados = {};
     CATEGORIAS_CONFIG.forEach(cfg => {
@@ -541,11 +541,11 @@ async function carregarDados() {
         cfg.keys.some(k => i.categoria.toLowerCase() === k)
       );
     });
-    dados.promocoes = visiveis.filter(i => i.promocao === 'SIM' && i.desconto > 0);
+    dados.promocoes   = visiveis.filter(i => i.promocao === 'SIM' && i.desconto > 0);
 
     dadosGlobais = dados;
-    const promoAntes = temPromocoes;
-    temPromocoes = !MODO_SEM_PROMO && dados.promocoes.length > 0;
+    const promoAntes       = temPromocoes;
+    temPromocoes   = !MODO_SEM_PROMO && dados.promocoes.length > 0;
 
     // Rebuild completo: reconstrói o DOM de slides e rerenderiza
     const rebuild = () => {

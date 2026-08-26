@@ -4,19 +4,22 @@
   "itens": {},
   "categorias": {
     "Bovinos": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.01/imagens/cat-bovinos.png",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-bovinos.png",
       "alt": "Bovinos — Açougue Ouro Verde",
-      "position": "50% 50%"
+      "position": "50% 50%",
+      "zoom": 1
     },
     "Suinos": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.01/imagens/cat-suinos.jpg",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-suinos.jpg",
       "alt": "Suinos — Açougue Ouro Verde",
-      "position": "50% 50%"
+      "position": "50% 50%",
+      "zoom": 1
     },
     "Aves": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.01/imagens/cat-aves.jpg",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-aves.jpg",
       "alt": "Aves — Açougue Ouro Verde",
-      "position": "50% 50%"
+      "position": "50% 50%",
+      "zoom": 1
     }
   }
 }

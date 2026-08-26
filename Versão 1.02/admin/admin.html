@@ -257,6 +257,21 @@
       display: block;
     }
 
+    /* ─── TV-RATIO PREVIEW (category cards only) ─── */
+    .card-foto-area--tv {
+      width: 140px;
+      height: auto;
+      aspect-ratio: 340 / 940;
+      margin: 12px auto 0;
+      border-radius: 6px;
+      background: var(--bg2);
+      overflow: hidden;
+    }
+
+    .card-foto-area--tv .card-foto {
+      filter: brightness(0.88);
+    }
+
     .card-foto-overlay {
       position: absolute;
       inset: 0;
@@ -510,6 +525,36 @@
       text-align: right;
       flex-shrink: 0;
     }
+
+    .pos-slider-row .pos-val.pos-zoom-val {
+      width: 44px;
+    }
+
+    .pos-zoom-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid var(--brd2);
+      background: var(--bg);
+      color: var(--txt);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .pos-zoom-btn:hover { background: var(--brd); }
+
+    .btn-resetar-ajuste {
+      width: 100%;
+      margin-top: 8px;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -628,6 +673,22 @@
     // Aba MENU consolidada (mesma planilha, todas as 7 categorias)
     const SHEET_CSV_URL =
       'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEq8oeTNFgdAnWZIGOrmoU8QO7WqlMAyvXLPS5rToesYvZdNaoJAgj3pyVcNpPHo8Sk4ty_IukrWt9/pub?gid=1408167426&single=true&output=csv';
+
+    // Computado uma única vez ao carregar a página, para que re-renders não
+    // busquem as imagens de novo. Nota: raw.githubusercontent.com ainda tem
+    // alguns minutos de delay de propagação de CDN que nenhuma query string contorna.
+    const CACHE_BUST_TS = Date.now();
+    function comCacheBust(url) {
+      if (!url || !/^https?:\/\//i.test(url)) return url;
+      return url + (url.includes('?') ? '&' : '?') + 'v=' + CACHE_BUST_TS;
+    }
+
+    function aplicarAjusteImg(imgEl, position, zoom) {
+      if (!imgEl) return;
+      imgEl.style.objectPosition  = position;
+      imgEl.style.transformOrigin = position;
+      imgEl.style.transform       = `scale(${zoom})`;
+    }
 
     /* ══════════════════════════════════════════════
        STATE
@@ -777,6 +838,7 @@
         headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
       });
       if (resp.status === 404) return null;
+      if (!resp.ok) throw new Error(`GitHub ${resp.status} ao ler ${path}`);
       const data = await resp.json();
       return data.sha || null;
     }
@@ -891,7 +953,7 @@
 
         if (temFoto) {
           const img     = document.createElement('img');
-          img.src       = fotoData.foto;
+          img.src       = fotoData.isNew ? fotoData.foto : comCacheBust(fotoData.foto);
           img.className = 'card-foto';
           img.alt       = nome;
           img.onerror   = () => { img.style.display = 'none'; };
@@ -952,15 +1014,15 @@
         card.className = classes;
 
         const fotoArea = document.createElement('div');
-        fotoArea.className = 'card-foto-area';
+        fotoArea.className = 'card-foto-area card-foto-area--tv';
 
         if (temFoto) {
           const img     = document.createElement('img');
-          img.src       = fotoData.foto;
+          img.src       = fotoData.isNew ? fotoData.foto : comCacheBust(fotoData.foto);
           img.className = 'card-foto';
           img.alt       = nome;
           img.onerror   = () => { img.style.display = 'none'; };
-          img.style.objectPosition = fotoData.position || '50% 50%';
+          aplicarAjusteImg(img, fotoData.position || '50% 50%', fotoData.zoom || 1);
           fotoArea.appendChild(img);
 
           const btnRem       = document.createElement('button');
@@ -999,9 +1061,10 @@
         card.appendChild(info);
 
         if (temFoto) {
-          const pos = (fotoData.position || '50% 50%').split(' ');
-          const px  = parseInt(pos[0]) || 50;
-          const py  = parseInt(pos[1]) || 50;
+          const pos  = (fotoData.position || '50% 50%').split(' ');
+          const px   = parseInt(pos[0]) || 50;
+          const py   = parseInt(pos[1]) || 50;
+          const zoom = fotoData.zoom || 1;
 
           const posControl = document.createElement('div');
           posControl.className = 'pos-control';
@@ -1017,26 +1080,76 @@
               <input type="range" min="0" max="100" value="${py}" data-axis="y" data-cat="${nome}" />
               <span class="pos-val">${py}%</span>
             </div>
+            <div class="pos-slider-row">
+              <span class="pos-axis">🔍</span>
+              <button type="button" class="pos-zoom-btn" data-zoom-btn="menos" data-cat="${nome}">−</button>
+              <input type="range" min="1" max="3" step="0.05" value="${zoom}" data-axis="zoom" data-cat="${nome}" />
+              <button type="button" class="pos-zoom-btn" data-zoom-btn="mais" data-cat="${nome}">+</button>
+              <span class="pos-val pos-zoom-val">${zoom.toFixed(2)}×</span>
+            </div>
+            <button type="button" class="btn btn-secundario btn-sm btn-resetar-ajuste" data-reset-cat="${nome}">Resetar</button>
           `;
+
+          const getImgEl = () => card.querySelector('.card-foto');
 
           posControl.querySelectorAll('input[type="range"]').forEach(slider => {
             slider.addEventListener('input', function () {
               const catNome = this.dataset.cat;
               const axis    = this.dataset.axis;
-              this.nextElementSibling.textContent = this.value + '%';
-
-              const curr = (categoriasMap[catNome]?.position || '50% 50%').split(' ');
-              const newX = axis === 'x' ? this.value : parseInt(curr[0]);
-              const newY = axis === 'y' ? this.value : parseInt(curr[1]);
-              const newPos = `${newX}% ${newY}%`;
-
-              const imgEl = card.querySelector('.card-foto');
-              if (imgEl) imgEl.style.objectPosition = newPos;
-
               if (!categoriasMap[catNome]) categoriasMap[catNome] = {};
-              categoriasMap[catNome].position      = newPos;
-              categoriasMap[catNome].positionDirty = true;
+              const cat = categoriasMap[catNome];
+
+              if (axis === 'zoom') {
+                const z = Math.min(3, Math.max(1, parseFloat(this.value) || 1));
+                cat.zoom = z;
+                posControl.querySelector('.pos-zoom-val').textContent = z.toFixed(2) + '×';
+              } else {
+                this.nextElementSibling.textContent = this.value + '%';
+                const curr = (cat.position || '50% 50%').split(' ');
+                const newX = axis === 'x' ? this.value : parseInt(curr[0]);
+                const newY = axis === 'y' ? this.value : parseInt(curr[1]);
+                cat.position = `${newX}% ${newY}%`;
+              }
+
+              cat.ajusteDirty = true;
+              aplicarAjusteImg(getImgEl(), cat.position || '50% 50%', cat.zoom || 1);
             });
+          });
+
+          posControl.querySelectorAll('.pos-zoom-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+              const catNome = this.dataset.cat;
+              if (!categoriasMap[catNome]) categoriasMap[catNome] = {};
+              const cat    = categoriasMap[catNome];
+              const slider = posControl.querySelector('input[data-axis="zoom"]');
+              let z = parseFloat(slider.value) || 1;
+              z += this.dataset.zoomBtn === 'mais' ? 0.05 : -0.05;
+              z = Math.round(Math.min(3, Math.max(1, z)) * 100) / 100;
+              slider.value = z;
+              cat.zoom = z;
+              cat.ajusteDirty = true;
+              posControl.querySelector('.pos-zoom-val').textContent = z.toFixed(2) + '×';
+              aplicarAjusteImg(getImgEl(), cat.position || '50% 50%', z);
+            });
+          });
+
+          posControl.querySelector('[data-reset-cat]').addEventListener('click', function () {
+            const catNome = this.dataset.resetCat;
+            if (!categoriasMap[catNome]) categoriasMap[catNome] = {};
+            const cat = categoriasMap[catNome];
+            cat.position    = '50% 50%';
+            cat.zoom        = 1;
+            cat.ajusteDirty = true;
+
+            const sliderX = posControl.querySelector('input[data-axis="x"]');
+            const sliderY = posControl.querySelector('input[data-axis="y"]');
+            const sliderZ = posControl.querySelector('input[data-axis="zoom"]');
+            sliderX.value = 50; sliderX.nextElementSibling.textContent = '50%';
+            sliderY.value = 50; sliderY.nextElementSibling.textContent = '50%';
+            sliderZ.value = 1;
+            posControl.querySelector('.pos-zoom-val').textContent = '1.00×';
+
+            aplicarAjusteImg(getImgEl(), '50% 50%', 1);
           });
 
           card.appendChild(posControl);
@@ -1122,7 +1235,7 @@
 
         categoriasMap = {};
         for (const [nome, data] of Object.entries(fotosAtual.categorias || {})) {
-          categoriasMap[nome] = { foto: data.foto, alt: data.alt, position: data.position || '50% 50%', isNew: false };
+          categoriasMap[nome] = { foto: data.foto, alt: data.alt, position: data.position || '50% 50%', zoom: data.zoom || 1, isNew: false };
         }
 
         atualizarStats();
@@ -1152,7 +1265,7 @@
       }
       for (const [nome, data] of Object.entries(fotosAtual.categorias || {})) {
         if (!categoriasMap[nome] || !categoriasMap[nome].isNew) {
-          categoriasMap[nome] = { foto: data.foto, alt: data.alt, position: data.position || '50% 50%', isNew: false };
+          categoriasMap[nome] = { foto: data.foto, alt: data.alt, position: data.position || '50% 50%', zoom: data.zoom || 1, isNew: false };
         }
       }
       atualizarStats();
@@ -1168,10 +1281,10 @@
       const fotosRemovidas = Object.entries(fotosMap).filter(([, f]) => f.isRemoved);
       const novasCats      = CATEGORIAS.filter(c => categoriasMap[c.nome]?.isNew);
       const catsRemovidas  = CATEGORIAS.filter(c => categoriasMap[c.nome]?.isRemoved);
-      const positionsDirty = CATEGORIAS.filter(c => categoriasMap[c.nome]?.positionDirty && !categoriasMap[c.nome]?.isNew);
+      const ajustesDirty   = CATEGORIAS.filter(c => categoriasMap[c.nome]?.ajusteDirty && !categoriasMap[c.nome]?.isNew);
 
       const totalOps = novasFotos.length + novasCats.length;
-      const temAlteracao = totalOps || fotosRemovidas.length || catsRemovidas.length || positionsDirty.length;
+      const temAlteracao = totalOps || fotosRemovidas.length || catsRemovidas.length || ajustesDirty.length;
 
       if (!temAlteracao) {
         mostrarToast('Nenhuma alteração para salvar.', 'info');
@@ -1184,6 +1297,7 @@
       try {
         const fotosAtual = await carregarFotosJsonAtual();
         if (!fotosAtual.categorias) fotosAtual.categorias = {};
+        if (!fotosAtual.itens) fotosAtual.itens = {};
 
         let opsDone = 0;
 
@@ -1204,7 +1318,7 @@
           atualizarProgresso(Math.round((opsDone / Math.max(totalOps, 1)) * 80));
           mostrarToast(`Enviando categoria ${nome}…`, 'info');
           const rawUrl = await uploadImagem(`${slug}.${fotoData.ext || 'jpg'}`, fotoData.base64);
-          fotosAtual.categorias[nome] = { foto: rawUrl, alt: `${nome} — Açougue Ouro Verde`, position: fotoData.position || '50% 50%' };
+          fotosAtual.categorias[nome] = { foto: rawUrl, alt: `${nome} — Açougue Ouro Verde`, position: fotoData.position || '50% 50%', zoom: fotoData.zoom || 1 };
           opsDone++;
         }
 
@@ -1212,9 +1326,10 @@
           delete fotosAtual.categorias[nome];
         }
 
-        for (const { nome } of positionsDirty) {
+        for (const { nome } of ajustesDirty) {
           if (fotosAtual.categorias[nome]) {
             fotosAtual.categorias[nome].position = categoriasMap[nome].position || '50% 50%';
+            fotosAtual.categorias[nome].zoom     = categoriasMap[nome].zoom || 1;
           }
         }
 
@@ -1226,10 +1341,10 @@
         fotosRemovidas.forEach(([nome])  => { delete fotosMap[nome]; });
         novasCats.forEach(({ nome })     => { categoriasMap[nome].isNew = false; });
         catsRemovidas.forEach(({ nome }) => { delete categoriasMap[nome]; });
-        positionsDirty.forEach(({ nome }) => { categoriasMap[nome].positionDirty = false; });
+        ajustesDirty.forEach(({ nome }) => { categoriasMap[nome].ajusteDirty = false; });
 
         atualizarProgresso(100);
-        const n = novasFotos.length + novasCats.length + fotosRemovidas.length + catsRemovidas.length + positionsDirty.length;
+        const n = novasFotos.length + novasCats.length + fotosRemovidas.length + catsRemovidas.length + ajustesDirty.length;
         mostrarToast(`✓ ${n} alteração(ões) salva(s)! Site atualiza em 1-2 minutos.`, 'ok');
         atualizarStats();
         renderizarCategorias();

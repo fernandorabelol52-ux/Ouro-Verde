@@ -343,6 +343,7 @@ html, body {
   border-radius: 4px;
   filter: brightness(0.88);
   display: block;
+  will-change: transform;
 }
 
 .foto-placeholder {

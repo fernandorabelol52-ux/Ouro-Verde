@@ -30,7 +30,7 @@ const SLIDE_FADE_MS      = 800;
 // Máximo de itens visíveis por coluna
 // TV 1080px − header 68 − footer 44 − cat-hdr 46 = ~922px úteis
 // Cada sp-card com font 18px: padding 7×2 + borda 1 + linha ≈ 43px → ~21 itens
-// Usamos 20 para folga segura
+// Usamos 16 para folga segura
 const ITENS_POR_COLUNA = 16;
 
 /* ============================================================
@@ -52,6 +52,7 @@ let pendingRender    = null;     // função a chamar após transição do slide
 let FOTOS_MAP      = {};
 let FOTO_FALLBACK  = 'logo.png';
 let CATEGORIAS_MAP = {};
+let FOTOS_VERSAO   = '';
 
 /* ============================================================
    CONFIG DAS CATEGORIAS (ordem de exibição + cores do header)
@@ -115,6 +116,7 @@ async function carregarFotos() {
     const dados = await resp.json();
     FOTOS_MAP     = dados.itens    || {};
     FOTO_FALLBACK = dados.fallback || 'logo.png';
+    FOTOS_VERSAO  = dados.versao   || '';
     CATEGORIAS_MAP = {};
     for (const [k, v] of Object.entries(dados.categorias || {})) {
       const kNorm = k.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -137,7 +139,8 @@ function getFotoCategoria(categoria) {
   const k = (categoria || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   const entrada = CATEGORIAS_MAP[k];
   if (!entrada || !entrada.foto) return null;
-  return { foto: entrada.foto, position: entrada.position || '50% 50%' };
+  const zoom = Math.min(3, Math.max(1, parseFloat(entrada.zoom) || 1));
+  return { foto: entrada.foto, position: entrada.position || '50% 50%', zoom };
 }
 
 function criarImgComFallback(nomeCorte, cssClass) {
@@ -170,8 +173,12 @@ function injetarFotosColuna(colEl, categoriaKey, nomes, maxItens = 2) {
     const wrap = document.createElement('div');
     wrap.className = 'foto-cell';
     const img = criarImgComFallback(categoriaKey, 'foto-corte');
-    img.src = cat.foto;
-    img.style.objectPosition = cat.position;
+    img.src = /^https?:\/\//i.test(cat.foto)
+      ? cat.foto + (cat.foto.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(FOTOS_VERSAO)
+      : cat.foto;
+    img.style.objectPosition  = cat.position;
+    img.style.transformOrigin = cat.position; // zoom keeps the focal point fixed
+    img.style.transform       = `scale(${cat.zoom})`;
     wrap.appendChild(img);
     colEl.appendChild(wrap);
     return;
@@ -505,7 +512,13 @@ function goToSlide(targetId) {
   setTimeout(() => {
     prevEl.style.zIndex = '';
     nextEl.style.zIndex = '';
-    if (pendingRender) { pendingRender(); pendingRender = null; }
+    if (pendingRender) {
+      const fn = pendingRender;
+      pendingRender = null;
+      isTransitioning = false;
+      fn();            // rebuild starts its own timer
+      return;
+    }
     isTransitioning = false;
     slideTimer = setInterval(avancarSlide, SLIDE_DURATION_MS);
   }, SLIDE_FADE_MS + 60);

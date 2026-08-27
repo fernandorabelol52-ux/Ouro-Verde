@@ -365,7 +365,7 @@ html, body {
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 480px 1fr;
 }
 
 .s1-fotos {
@@ -763,7 +763,7 @@ html, body {
 .s-duplo-corpo {
   flex: 1;
   display: grid;
-  grid-template-columns: 340px 3px 1fr 3px 1fr;
+  grid-template-columns: 480px 3px 1fr 3px 1fr;
   overflow: hidden;
   min-height: 0;
 }

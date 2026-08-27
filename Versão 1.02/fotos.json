@@ -1,5 +1,5 @@
 {
-  "versao": "2026-07-21T00:00:00.000Z",
+  "versao": "2026-08-27T00:13:46.472Z",
   "fallback": "logo.png",
   "itens": {},
   "categorias": {
@@ -10,15 +10,39 @@
       "zoom": 1
     },
     "Suinos": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-suinos.jpg",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-suinos.jpeg",
       "alt": "Suinos — Açougue Ouro Verde",
-      "position": "50% 50%",
+      "position": "50% 51%",
       "zoom": 1
     },
     "Aves": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-aves.jpg",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-aves.png",
       "alt": "Aves — Açougue Ouro Verde",
+      "position": "38% 50%",
+      "zoom": 1
+    },
+    "Miudos": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-miudos.jpeg",
+      "alt": "Miudos — Açougue Ouro Verde",
+      "position": "50% 0%",
+      "zoom": 1.15
+    },
+    "Frios": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-frios.jpeg",
+      "alt": "Frios — Açougue Ouro Verde",
+      "position": "44% 50%",
+      "zoom": 1
+    },
+    "Linguicas": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-linguicas.jpeg",
+      "alt": "Linguicas — Açougue Ouro Verde",
       "position": "50% 50%",
+      "zoom": 1
+    },
+    "Espetos": {
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-espetos.jpeg",
+      "alt": "Espetos — Açougue Ouro Verde",
+      "position": "75% 50%",
       "zoom": 1
     }
   }

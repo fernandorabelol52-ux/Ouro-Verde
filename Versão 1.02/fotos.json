@@ -1,31 +1,31 @@
 {
-  "versao": "2026-08-27T00:13:46.472Z",
+  "versao": "2026-09-09T19:06:55.249Z",
   "fallback": "logo.png",
   "itens": {},
   "categorias": {
     "Bovinos": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-bovinos.png",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-bovinos.jpeg",
       "alt": "Bovinos — Açougue Ouro Verde",
-      "position": "50% 50%",
-      "zoom": 1
+      "position": "47% 47%",
+      "zoom": 1.6
     },
     "Suinos": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-suinos.jpeg",
       "alt": "Suinos — Açougue Ouro Verde",
-      "position": "50% 51%",
-      "zoom": 1
+      "position": "50% 52%",
+      "zoom": 1.85
     },
     "Aves": {
-      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-aves.png",
+      "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-aves.jpeg",
       "alt": "Aves — Açougue Ouro Verde",
-      "position": "38% 50%",
-      "zoom": 1
+      "position": "50% 18%",
+      "zoom": 1.25
     },
     "Miudos": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-miudos.jpeg",
       "alt": "Miudos — Açougue Ouro Verde",
-      "position": "50% 0%",
-      "zoom": 1.15
+      "position": "50% 50%",
+      "zoom": 1.6
     },
     "Frios": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-frios.jpeg",

@@ -1,5 +1,5 @@
 {
-  "versao": "2026-09-09T19:06:55.249Z",
+  "versao": "2026-09-09T20:05:43.927Z",
   "fallback": "logo.png",
   "itens": {},
   "categorias": {
@@ -30,8 +30,8 @@
     "Frios": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-frios.jpeg",
       "alt": "Frios — Açougue Ouro Verde",
-      "position": "44% 50%",
-      "zoom": 1
+      "position": "50% 35%",
+      "zoom": 1.45
     },
     "Linguicas": {
       "foto": "https://raw.githubusercontent.com/fernandorabelol52-ux/Ouro-Verde/main/Vers%C3%A3o%201.02/imagens/cat-linguicas.jpeg",

@@ -30,9 +30,10 @@ const SLIDE_FADE_MS      = 800;
 const RETRY_INICIAL_MS   = 30000;  // retry enquanto a primeira carga não der certo
 
 // Máximo de itens visíveis por coluna
-// Fonte da lista dobrada (×2): cada linha tem ~96px (nome 44px, preço 68px)
-// TV 1080px − header 68 − footer 44 − cat-hdr ~78 = ~890px úteis → 9 linhas
-const ITENS_POR_COLUNA = 9;
+// Fonte da lista dobrada (×2): cada linha mede 104px no navegador real
+// (Google Fonts). TV 1080px − header 68 − footer 44 − cat-hdr 79 = 889px
+// úteis → 8 linhas (832px), com folga
+const ITENS_POR_COLUNA = 8;
 
 /* ============================================================
    ESTADO GLOBAL
